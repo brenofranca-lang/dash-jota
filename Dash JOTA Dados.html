@@ -1,0 +1,3659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Marketing & Prospecção - JOTA Jornalismo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+
+ body {
+ font-family: 'Times New Roman', Times, serif;
+ background: #0a0a0a;
+ background-image: 
+ radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.05) 0%, transparent 50%),
+ radial-gradient(circle at 80% 80%, rgba(247, 147, 30, 0.05) 0%, transparent 50%);
+ background-attachment: fixed;
+ padding: 20px;
+ color: #e5e5e5;
+ min-height: 100vh;
+ }
+
+ .container {
+ max-width: 1600px;
+ margin: 0 auto;
+ }
+
+ .header {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ padding: 40px;
+ border-radius: 24px;
+ margin-bottom: 30px;
+ box-shadow: 
+ 0 20px 60px rgba(0,0,0,0.5),
+ 0 0 0 1px rgba(255, 107, 53, 0.1) inset;
+ position: relative;
+ overflow: hidden;
+ }
+
+ .header::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ height: 3px;
+ background: linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #ff6b35 100%);
+ animation: shimmer 3s infinite;
+ }
+
+ @keyframes shimmer {
+ 0%, 100% { opacity: 0.5; }
+ 50% { opacity: 1; }
+ }
+
+ .header h1 {
+ color: #fff;
+ font-size: 2.5em;
+ margin-bottom: 12px;
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ font-weight: 700;
+ letter-spacing: -0.5px;
+ }
+
+ .header p {
+ color: #a0a0a0;
+ font-size: 1.1em;
+ font-weight: 400;
+ }
+
+ .tabs {
+ display: flex;
+ gap: 12px;
+ margin-bottom: 30px;
+ flex-wrap: wrap;
+ padding: 20px;
+ background: rgba(20, 20, 20, 0.6);
+ backdrop-filter: blur(10px);
+ border-radius: 20px;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ }
+
+ .tab-button {
+ background: rgba(30, 30, 30, 0.8);
+ border: 1px solid rgba(255, 107, 53, 0.2);
+ padding: 14px 28px;
+ border-radius: 12px;
+ cursor: pointer;
+ font-size: 0.95em;
+ font-weight: 600;
+ color: #e5e5e5;
+ transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ position: relative;
+ overflow: hidden;
+ }
+
+ .tab-button::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: -100%;
+ width: 100%;
+ height: 100%;
+ background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+ transition: left 0.5s;
+ }
+
+ .tab-button:hover::before {
+ left: 100%;
+ }
+
+ .tab-button:hover {
+ transform: translateY(-2px);
+ border-color: #ff6b35;
+ box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
+ }
+
+ .tab-button.active {
+ background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+ color: white;
+ border-color: #ff6b35;
+ box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+ }
+
+ .tab-content {
+ display: none;
+ animation: fadeIn 0.5s ease;
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+ .tab-content.active {
+ display: block;
+ }
+
+ .metrics-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+ gap: 24px;
+ margin-bottom: 35px;
+ }
+
+ .metric-card {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ padding: 28px;
+ border-radius: 20px;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ position: relative;
+ overflow: hidden;
+ }
+
+ .metric-card::after {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 2px;
+ background: linear-gradient(90deg, transparent, #ff6b35, transparent);
+ opacity: 0;
+ transition: opacity 0.3s;
+ }
+
+ .metric-card:hover {
+ transform: translateY(-8px);
+ box-shadow: 0 20px 50px rgba(255, 107, 53, 0.2);
+ border-color: rgba(255, 107, 53, 0.3);
+ }
+
+ .metric-card:hover::after {
+ opacity: 1;
+ }
+
+ .metric-card.positive {
+ border-left: 3px solid #ff6b35;
+ }
+
+ .metric-card.neutral {
+ border-left: 3px solid #3b82f6;
+ }
+
+ .metric-card.negative {
+ border-left: 3px solid #ef4444;
+ }
+
+ .metric-icon {
+ position: absolute;
+ top: 24px;
+ right: 24px;
+ font-size: 2.8em;
+ opacity: 0.06;
+ color: #fff;
+ }
+
+ .metric-label {
+ font-size: 0.85em;
+ color: #a0a0a0;
+ margin-bottom: 10px;
+ text-transform: uppercase;
+ font-weight: 600;
+ letter-spacing: 0.5px;
+ position: relative;
+ z-index: 1;
+ }
+
+ .metric-value {
+ font-size: 2.4em;
+ font-weight: 700;
+ color: #ffffff;
+ margin-bottom: 8px;
+ position: relative;
+ z-index: 1;
+ letter-spacing: -1px;
+ }
+
+ .metric-change {
+ font-size: 0.9em;
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ position: relative;
+ z-index: 1;
+ font-weight: 500;
+ }
+
+ .metric-change.positive {
+ color: #ff6b35;
+ }
+
+ .metric-change.neutral {
+ color: #60a5fa;
+ }
+
+ .metric-change.negative {
+ color: #f87171;
+ }
+
+ .chart-container {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ padding: 30px;
+ border-radius: 20px;
+ margin-bottom: 35px;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+ }
+
+ .chart-title {
+ font-size: 1.4em;
+ color: #ffffff;
+ margin-bottom: 24px;
+ font-weight: 700;
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ letter-spacing: -0.3px;
+ }
+
+ .two-column {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 28px;
+ margin-bottom: 35px;
+ clear: both;
+ }
+
+ .three-column {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 28px;
+ margin-bottom: 35px;
+ clear: both;
+ }
+
+ .table-container {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ padding: 30px;
+ border-radius: 20px;
+ margin-bottom: 35px;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+ overflow-x: auto;
+ }
+
+ .table-title {
+ font-size: 1.4em;
+ color: #ffffff;
+ margin-bottom: 24px;
+ font-weight: 700;
+ letter-spacing: -0.3px;
+ }
+
+ table {
+ width: 100%;
+ border-collapse: separate;
+ border-spacing: 0;
+ }
+
+ thead {
+ background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+ color: white;
+ }
+
+ th {
+ padding: 16px;
+ text-align: left;
+ font-weight: 600;
+ color: white;
+ font-size: 0.9em;
+ letter-spacing: 0.3px;
+ }
+
+ th:first-child {
+ border-top-left-radius: 12px;
+ }
+
+ th:last-child {
+ border-top-right-radius: 12px;
+ }
+
+ td {
+ padding: 14px 16px;
+ border-bottom: 1px solid rgba(255, 107, 53, 0.05);
+ color: #e5e5e5;
+ font-size: 0.95em;
+ }
+
+ tr:hover {
+ background: rgba(255, 107, 53, 0.05);
+ }
+
+ tr:last-child td:first-child {
+ border-bottom-left-radius: 12px;
+ }
+
+ tr:last-child td:last-child {
+ border-bottom-right-radius: 12px;
+ }
+
+ .badge {
+ display: inline-block;
+ padding: 6px 14px;
+ border-radius: 20px;
+ font-size: 0.8em;
+ font-weight: 600;
+ letter-spacing: 0.3px;
+ }
+
+ .badge.orange {
+ background: rgba(255, 107, 53, 0.15);
+ color: #ff9b6e;
+ border: 1px solid rgba(255, 107, 53, 0.3);
+ }
+
+ .badge.green {
+ background: rgba(16, 185, 129, 0.15);
+ color: #6ee7b7;
+ border: 1px solid rgba(16, 185, 129, 0.3);
+ }
+
+ .badge.blue {
+ background: rgba(59, 130, 246, 0.15);
+ color: #93c5fd;
+ border: 1px solid rgba(59, 130, 246, 0.3);
+ }
+
+ .badge.red {
+ background: rgba(239, 68, 68, 0.15);
+ color: #fca5a5;
+ border: 1px solid rgba(239, 68, 68, 0.3);
+ }
+
+ .badge.yellow {
+ background: rgba(245, 158, 11, 0.15);
+ color: #fcd34d;
+ border: 1px solid rgba(245, 158, 11, 0.3);
+ }
+
+ .progress-bar {
+ width: 100%;
+ height: 8px;
+ background: rgba(255, 255, 255, 0.05);
+ border-radius: 10px;
+ overflow: hidden;
+ margin-top: 10px;
+ }
+
+ .progress-fill {
+ height: 100%;
+ transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+ position: relative;
+ }
+
+ .progress-fill::after {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+ animation: shimmerBar 2s infinite;
+ }
+
+ @keyframes shimmerBar {
+ 0% { transform: translateX(-100%); }
+ 100% { transform: translateX(100%); }
+ }
+
+ .progress-fill.green {
+ background: linear-gradient(90deg, #ff6b35, #f7931e);
+ }
+
+ .progress-fill.blue {
+ background: linear-gradient(90deg, #3b82f6, #2563eb);
+ }
+
+ .progress-fill.red {
+ background: linear-gradient(90deg, #ef4444, #dc2626);
+ }
+
+ .stat-highlight {
+ background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+ color: white;
+ padding: 4px 10px;
+ border-radius: 6px;
+ font-weight: 700;
+ box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+ }
+
+ .insight-box {
+ background: rgba(255, 107, 53, 0.05);
+ backdrop-filter: blur(10px);
+ border: 1px solid rgba(255, 107, 53, 0.2);
+ border-left: 4px solid #ff6b35;
+ padding: 24px;
+ border-radius: 16px;
+ margin: 28px 0;
+ box-shadow: 0 8px 20px rgba(255, 107, 53, 0.1);
+ }
+
+ .insight-box h3 {
+ color: #ff9b6e;
+ margin-bottom: 14px;
+ font-size: 1.3em;
+ font-weight: 700;
+ }
+
+ .insight-box p {
+ color: #d1d5db;
+ line-height: 1.7;
+ margin-bottom: 10px;
+ }
+
+ .insight-box ul {
+ margin-left: 24px;
+ color: #d1d5db;
+ }
+
+ .insight-box li {
+ margin-bottom: 10px;
+ line-height: 1.6;
+ }
+
+ .insight-box strong {
+ color: #ff6b35;
+ font-weight: 600;
+ }
+
+ .chart-container canvas {
+ max-height: 350px !important;
+ height: auto !important;
+ }
+
+ .comparison-card {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ padding: 24px;
+ border-radius: 16px;
+ text-align: center;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+ transition: all 0.3s ease;
+ }
+
+ .comparison-card:hover {
+ transform: translateY(-5px);
+ border-color: rgba(255, 107, 53, 0.3);
+ box-shadow: 0 12px 30px rgba(255, 107, 53, 0.2);
+ }
+
+ .comparison-card h4 {
+ color: #ff9b6e;
+ margin-bottom: 16px;
+ font-weight: 600;
+ }
+
+ .comparison-value {
+ font-size: 2.2em;
+ font-weight: 700;
+ color: #ffffff;
+ margin-bottom: 12px;
+ letter-spacing: -1px;
+ }
+
+ .comparison-label {
+ font-size: 0.9em;
+ color: #a0a0a0;
+ font-weight: 500;
+ }
+
+ .recommendations {
+ background: rgba(20, 20, 20, 0.95);
+ backdrop-filter: blur(20px);
+ padding: 30px;
+ border-radius: 20px;
+ margin-bottom: 35px;
+ border: 1px solid rgba(255, 107, 53, 0.1);
+ box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+ }
+
+ .recommendations h2 {
+ color: #ffffff;
+ margin-bottom: 24px;
+ font-size: 1.6em;
+ font-weight: 700;
+ border-bottom: 2px solid #ff6b35;
+ padding-bottom: 12px;
+ }
+
+ .recommendation-item {
+ padding: 18px;
+ margin-bottom: 16px;
+ border-left: 3px solid #ff6b35;
+ background: rgba(255, 107, 53, 0.05);
+ border-radius: 12px;
+ transition: all 0.3s ease;
+ }
+
+ .recommendation-item:hover {
+ background: rgba(255, 107, 53, 0.1);
+ transform: translateX(5px);
+ }
+
+ .recommendation-item h4 {
+ color: #ff9b6e;
+ margin-bottom: 10px;
+ font-size: 1.1em;
+ font-weight: 600;
+ }
+
+ .recommendation-item p {
+ color: #d1d5db;
+ line-height: 1.7;
+ }
+
+ .recommendation-item ul {
+ margin-left: 24px;
+ color: #d1d5db;
+ }
+
+ .recommendation-item li {
+ margin-bottom: 6px;
+ }
+
+ .priority-high {
+ border-left-color: #ef4444;
+ background: rgba(239, 68, 68, 0.05);
+ }
+
+ .priority-high h4 {
+ color: #fca5a5;
+ }
+
+ .priority-high p {
+ color: #d1d5db;
+ }
+
+ .priority-medium {
+ border-left-color: #f59e0b;
+ background: rgba(245, 158, 11, 0.05);
+ }
+
+ .priority-medium h4 {
+ color: #fcd34d;
+ }
+
+ .priority-medium p {
+ color: #d1d5db;
+ }
+
+ .section-divider {
+ height: 2px;
+ background: linear-gradient(90deg, transparent, #ff6b35, #f7931e, transparent);
+ margin: 45px 0;
+ border-radius: 2px;
+ opacity: 0.5;
+ }
+
+ @media (max-width: 1200px) {
+ .two-column, .three-column {
+ grid-template-columns: 1fr;
+ }
+ }
+
+ @media (max-width: 768px) {
+ body {
+ padding: 12px;
+ }
+
+ .header {
+ padding: 24px;
+ }
+
+ .header h1 {
+ font-size: 1.8em;
+ }
+ 
+ .metrics-grid {
+ grid-template-columns: 1fr;
+ }
+ 
+ .tab-button {
+ padding: 12px 20px;
+ font-size: 0.85em;
+ }
+
+ .tabs {
+ padding: 12px;
+ }
+ }
+
+ .winner-badge {
+ display: inline-block;
+ padding: 8px 16px;
+ background: linear-gradient(135deg, #ff6b35, #f7931e);
+ color: white;
+ border-radius: 20px;
+ font-weight: 700;
+ margin-left: 10px;
+ animation: pulse 2s infinite;
+ box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+ font-size: 0.85em;
+ letter-spacing: 0.5px;
+ }
+
+ @keyframes pulse {
+ 0%, 100% { 
+ transform: scale(1);
+ box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+ }
+ 50% { 
+ transform: scale(1.05);
+ box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+ }
+ }
+
+ .highlight-box {
+ background: rgba(59, 130, 246, 0.05);
+ backdrop-filter: blur(10px);
+ border: 1px solid rgba(59, 130, 246, 0.2);
+ padding: 24px;
+ border-radius: 16px;
+ margin-bottom: 35px;
+ border-left: 4px solid #3b82f6;
+ }
+
+ .highlight-box h3 {
+ color: #60a5fa;
+ margin-bottom: 12px;
+ font-weight: 700;
+ }
+
+ .highlight-box p {
+ color: #d1d5db;
+ line-height: 1.7;
+ }
+
+ .highlight-box strong {
+ color: #ff6b35;
+ font-weight: 600;
+ }
+
+ .highlight-box ul {
+ margin-left: 24px;
+ color: #d1d5db;
+ }
+
+ /* Scrollbar personalizado */
+ ::-webkit-scrollbar {
+ width: 10px;
+ height: 10px;
+ }
+
+ ::-webkit-scrollbar-track {
+ background: rgba(20, 20, 20, 0.5);
+ }
+
+ ::-webkit-scrollbar-thumb {
+ background: linear-gradient(135deg, #ff6b35, #f7931e);
+ border-radius: 10px;
+ }
+
+ ::-webkit-scrollbar-thumb:hover {
+ background: linear-gradient(135deg, #f7931e, #ff6b35);
+ }
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Dashboard Marketing & Prospecção</h1>
+<p>Análise Completa de Performance - JOTA Jornalismo | 2025</p>
+</div>
+
+<div class="tabs">
+<button class="tab-button active" onclick="openTab('visao-geral')">Visão Geral</button>
+<button class="tab-button" onclick="openTab('comparativo')">Comparativo Completo</button>
+<button class="tab-button" onclick="openTab('analise-acoes')">Análise de Ações</button>
+<button class="tab-button" onclick="openTab('tier1-detalhado')">T1 - Análise Detalhada</button>
+<button class="tab-button" onclick="openTab('tier2-detalhado')">T2 - Análise Detalhada</button>
+<button class="tab-button" onclick="openTab('inbound')">Marketing (Inbound)</button>
+<button class="tab-button" onclick="openTab('outbound')">Prospecção (Outbound)</button>
+<button class="tab-button" onclick="openTab('metas')">Metas 2025</button>
+<button class="tab-button" onclick="openTab('campanhas')">Top Campanhas</button>
+</div>
+
+<!-- VISÃO GERAL -->
+<div id="visao-geral" class="tab-content active">
+<div class="insight-box">
+<h3>Principais Insights</h3>
+<p><strong>Melhor Performance:</strong> O canal <strong>Orgânico</strong> apresenta a maior taxa de conversão (23.33%) e o maior ticket médio (R$ 63.381), porém com menor volume.</p>
+<p><strong>Marketing (Inbound):</strong> Responde por 72% das oportunidades (726 deals), com taxa de conversão de 10.06% e receita total de R$ 1,31 milhões.</p>
+<p><strong>Prospecção (Outbound):</strong> Menor volume (84 deals), mas mantém taxa competitiva de 11.90% com ticket médio de R$ 25.139.</p>
+<p><strong>Grandes Contas vs SMB:</strong> Grandes Contas têm maior receita total (R$ 1,54M) e ticket médio mais alto, mas SMB gera maior volume de vendas (72 vs 29).</p>
+</div>
+
+<div class="metrics-grid">
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Total</div>
+<div class="metric-value">R$ 2,51M</div>
+<div class="metric-change positive">101 negócios ganhos</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Total Oportunidades</div>
+<div class="metric-value">1.004</div>
+<div class="metric-change neutral">Base completa 2021-2025</div>
+</div>
+<div class="metric-card neutral">
+<div class="metric-icon"></div>
+<div class="metric-label">Taxa Conversão Média</div>
+<div class="metric-value">10.06%</div>
+<div class="metric-change neutral">Base fechados (ganho/perda)</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Ticket Médio Geral</div>
+<div class="metric-value">R$ 24.844</div>
+<div class="metric-change positive">Baseado em 101 ganhos</div>
+</div>
+</div>
+
+<div class="two-column">
+<div class="chart-container">
+<div class="chart-title">Performance por Origem</div>
+<canvas id="chartOrigemGeral"></canvas>
+</div>
+<div class="chart-container">
+<div class="chart-title">Performance por Segmento</div>
+<canvas id="chartSegmentoGeral"></canvas>
+</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Comparativo: Volume x Taxa de Conversão x Receita</div>
+<canvas id="chartComparativoCompleto"></canvas>
+</div>
+</div>
+
+<!-- COMPARATIVO COMPLETO -->
+<div id="comparativo" class="tab-content">
+<div class="highlight-box">
+<h3>Vencedor: Orgânico</h3>
+<p><strong>Taxa de Conversão:</strong>23.33% - Mais que o dobro das outras origens!</p>
+<p><strong>Ticket Médio:</strong> R$ 63.381 - 3,5x maior que o Marketing e 2,5x maior que Prospecção</p>
+<p><strong>Recomendação:</strong> Investir em estratégias para aumentar o volume de leads orgânicos, como SEO, content marketing e networking profissional.</p>
+</div>
+
+<div class="insight-box">
+<h3> Análise Comparativa Detalhada</h3>
+<ul>
+<li><strong>Inbound (Marketing):</strong> Alto volume (726), conversão moderada (10.06%), ticket médio R$ 17.992 - Melhor para escala</li>
+<li><strong>Outbound (Prospecção):</strong> Baixo volume (84), conversão competitiva (11.90%), ticket médio R$ 25.139 - Eficiente mas limitado</li>
+<li><strong>Orgânico:</strong> Volume médio (61), altíssima conversão (23.33%), ticket médio R$ 63.381 - Máxima qualidade</li>
+<li><strong>Recomendação:</strong> Mix ideal seria 60% Inbound, 20% Orgânico (amplificado), 20% Prospecção direcionada</li>
+</ul>
+</div>
+
+<div class="three-column">
+<div class="comparison-card">
+<h4>Inbound - Marketing</h4>
+<div class="comparison-value">10.06%</div>
+<div class="comparison-label">Taxa de Conversão</div>
+<div style="margin-top: 20px;">
+<strong>Volume:</strong>726 deals<br>
+<strong>Ganhos:</strong>73<br>
+<strong>Receita:</strong> R$ 1,31M<br>
+<strong>Ticket:</strong> R$ 17.992
+</div>
+</div>
+<div class="comparison-card">
+<h4>Outbound - Prospecção</h4>
+<div class="comparison-value">11.90%</div>
+<div class="comparison-label">Taxa de Conversão</div>
+<div style="margin-top: 20px;">
+<strong>Volume:</strong>84 deals<br>
+<strong>Ganhos:</strong>10<br>
+<strong>Receita:</strong> R$ 251k<br>
+<strong>Ticket:</strong> R$ 25.139
+</div>
+</div>
+<div class="comparison-card" style="border: 3px solid #10b981;">
+<h4>Orgânico<span class="winner-badge">WINNER</span></h4>
+<div class="comparison-value" style="color: #10b981;">23.33%</div>
+<div class="comparison-label">Taxa de Conversão</div>
+<div style="margin-top: 20px;">
+<strong>Volume:</strong>61 deals<br>
+<strong>Ganhos:</strong>14<br>
+<strong>Receita:</strong> R$ 887k<br>
+<strong>Ticket:</strong> R$ 63.381
+</div>
+</div>
+</div>
+
+<div class="two-column">
+<div class="chart-container">
+<div class="chart-title">Receita por Origem</div>
+<canvas id="chartReceitaOrigem"></canvas>
+</div>
+<div class="chart-container">
+<div class="chart-title">Ticket Médio por Origem</div>
+<canvas id="chartTicketOrigem"></canvas>
+</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Comparativo Detalhado: Inbound vs Outbound vs Orgânico</div>
+<canvas id="chartComparativoDetalhado"></canvas>
+</div>
+
+<div class="table-container">
+<div class="chart-title">Resumo Comparativo Completo</div>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Total Oport.</th>
+<th>Ganhos</th>
+<th>Taxa Conv.</th>
+<th>Receita Total</th>
+<th>Ticket Médio</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background: #d1fae5;">
+<td><strong>Orgânico</strong></td>
+<td>61</td>
+<td>14</td>
+<td><strong>23.33%</strong></td>
+<td><strong>R$ 887.335</strong></td>
+<td><strong>R$ 63.381</strong></td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+<tr>
+<td><strong>Inbound - Marketing</strong></td>
+<td>726</td>
+<td>73</td>
+<td>10.06%</td>
+<td>R$ 1.313.428</td>
+<td>R$ 17.992</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>Outbound - Prospecção</strong></td>
+<td>84</td>
+<td>10</td>
+<td>11.90%</td>
+<td>R$ 251.388</td>
+<td>R$ 25.139</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>Outros</strong></td>
+<td>133</td>
+<td>4</td>
+<td>100.00%*</td>
+<td>R$ 57.149</td>
+<td>R$ 14.287</td>
+<td><span class="badge yellow">Pequeno</span></td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top: 15px; color: #d1d5db; font-size: 0.9em;">* Categoria "Outros" tem 100% pois apenas 4 deals foram fechados de 133 totais</p>
+</div>
+</div>
+
+<!-- ANÍLISE DE AÇÍ•ES -->
+<div id="analise-acoes" class="tab-content">
+<div class="insight-box">
+<h3>Análise Detalhada por Ação - Coluna AE</h3>
+<p><strong>DESCOBERTA CHAVE:</strong> Prospecção tem taxa de conversão <strong>74% MAIOR</strong> que Marketing (16.67% vs 9.59%)</p>
+<p><strong>Ticket Médio:</strong> Prospecção (R$ 47.447) é <strong>2,8x maior</strong> que Marketing (R$ 16.687)</p>
+<p><strong>Volume:</strong> Marketing tem mais ações (40 vs 33), mas Prospecção é mais eficiente por ação</p>
+<p><strong>Receita Perdida:</strong> Marketing perdeu R$ 8,3M vs R$ 4,5M da Prospecção - oportunidade de otimização!</p>
+</div>
+
+<div class="two-column">
+<div class="chart-container">
+<div class="chart-title">Marketing vs Prospecção - Ganhos x Perdidos</div>
+<canvas id="chartGanhosPerdidos"></canvas>
+</div>
+<div class="chart-container">
+<div class="chart-title">Receita Ganha vs Receita Perdida</div>
+<canvas id="chartReceitaComparativo"></canvas>
+</div>
+</div>
+
+<div class="three-column">
+<div class="comparison-card">
+<h4>Marketing</h4>
+<div class="comparison-value">9.59%</div>
+<div class="comparison-label">Taxa de Conversão</div>
+<div style="margin-top: 20px;">
+<strong>Ações:</strong>40<br>
+<strong>Ganhos:</strong>47<br>
+<strong>Perdidos:</strong>443<br>
+<strong>Receita Ganha:</strong> R$ 784k<br>
+<strong>Receita Perdida:</strong> R$ 8,3M<br>
+<strong>Ticket:</strong> R$ 16.687
+</div>
+</div>
+<div class="comparison-card" style="border: 3px solid #ff6b35;">
+<h4>Prospecção<span class="winner-badge">WINNER</span></h4>
+<div class="comparison-value" style="color: #ff6b35;">16.67%</div>
+<div class="comparison-label">Taxa de Conversão</div>
+<div style="margin-top: 20px;">
+<strong>Ações:</strong>33<br>
+<strong>Ganhos:</strong>24<br>
+<strong>Perdidos:</strong>120<br>
+<strong>Receita Ganha:</strong> R$ 1,1M<br>
+<strong>Receita Perdida:</strong> R$ 4,5M<br>
+<strong>Ticket:</strong> R$ 47.447
+</div>
+</div>
+<div class="comparison-card">
+<h4>Diferença</h4>
+<div class="comparison-value" style="color: #ff6b35;">+74%</div>
+<div class="comparison-label">Taxa Conv. Prosp.</div>
+<div style="margin-top: 20px;">
+<strong>Ticket Prosp.:</strong>+184%<br>
+<strong>Eficiência:</strong> Prosp.<br>
+<strong>Volume:</strong> Marketing<br>
+<strong>ROI:</strong> Prospecção<br>
+<strong>Escala:</strong> Marketing
+</div>
+</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Top 15 Ações que Mais Converteram</div>
+<canvas id="chartTopConversao"></canvas>
+</div>
+
+<div class="chart-container">
+<div class="chart-title"> ï¸ Top 15 Ações com Mais Perdidos</div>
+<canvas id="chartTopPerdidos"></canvas>
+</div>
+
+<div class="table-container">
+<div class="chart-title">Top 20 Ações por Receita - Detalhado</div>
+<table>
+<thead>
+<tr>
+<th>Ação</th>
+<th>Tipo</th>
+<th>Ganhos</th>
+<th>Perdidos</th>
+<th>Taxa Conv.</th>
+<th>Receita Ganha</th>
+<th>Receita Perdida</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>indicacao-colaborador</strong></td>
+<td><span class="badge blue">Outros</span></td>
+<td>6</td>
+<td>14</td>
+<td>30.00%</td>
+<td>R$ 409.216</td>
+<td>R$ 1.053.432</td>
+<td><span class="badge orange">Excelente</span></td>
+</tr>
+<tr>
+<td><strong>indicacao-cliente</strong></td>
+<td><span class="badge blue">Outros</span></td>
+<td>6</td>
+<td>3</td>
+<td>66.67%</td>
+<td>R$ 399.879</td>
+<td>R$ 187.776</td>
+<td><span class="badge orange">Excelente</span></td>
+</tr>
+<tr>
+<td><strong>tributario</strong></td>
+<td><span class="badge blue">Marketing</span></td>
+<td>18</td>
+<td>127</td>
+<td>12.41%</td>
+<td>R$ 360.168</td>
+<td>R$ 2.434.548</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>sdr-inbound-pagina-pro</strong></td>
+<td><span class="badge blue">Marketing</span></td>
+<td>17</td>
+<td>117</td>
+<td>12.69%</td>
+<td>R$ 258.706</td>
+<td>R$ 2.228.736</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>marketing-lp-trabalhista</strong></td>
+<td><span class="badge blue">Marketing</span></td>
+<td>9</td>
+<td>94</td>
+<td>8.74%</td>
+<td>R$ 181.364</td>
+<td>R$ 1.827.180</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>Zendesk Comercial</strong></td>
+<td><span class="badge blue">Marketing</span></td>
+<td>6</td>
+<td>52</td>
+<td>10.34%</td>
+<td>R$ 105.660</td>
+<td>R$ 1.013.652</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>lista-linkedin-seligman-escala6x1</strong></td>
+<td><span class="badge yellow">Prospecção</span></td>
+<td>1</td>
+<td>0</td>
+<td>100.00%</td>
+<td>R$ 68.400</td>
+<td>R$ 0</td>
+<td><span class="badge orange">Excelente</span></td>
+</tr>
+<tr>
+<td><strong>lista-linkedin-seligman-trabalhista</strong></td>
+<td><span class="badge yellow">Prospecção</span></td>
+<td>1</td>
+<td>5</td>
+<td>16.67%</td>
+<td>R$ 61.812</td>
+<td>R$ 305.940</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td><strong>programa-indicacao-interno</strong></td>
+<td><span class="badge blue">Outros</span></td>
+<td>1</td>
+<td>26</td>
+<td>3.70%</td>
+<td>R$ 48.240</td>
+<td>R$ 458.088</td>
+<td><span class="badge red">Baixo</span></td>
+</tr>
+<tr>
+<td><strong>pro-saude</strong></td>
+<td><span class="badge blue">Marketing</span></td>
+<td>1</td>
+<td>14</td>
+<td>6.67%</td>
+<td>R$ 46.800</td>
+<td>R$ 266.280</td>
+<td><span class="badge red">Baixo</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="highlight-box">
+<h3>Recomendações Baseadas na Análise de Ações</h3>
+<p><strong>1. ESCALAR PROSPECÇÍO URGENTE:</strong></p>
+<ul>
+<li>Taxa de conversão 74% maior e ticket 2,8x maior que Marketing</li>
+<li>Aumentar de 33 para 60+ ações qualificadas de prospecçção</li>
+<li>Replicar estratégia LinkedIn (Seligman) que tem 100% de conversão em alguns casos</li>
+</ul>
+<p><strong>2. OTIMIZAR MARKETING:</strong></p>
+<ul>
+<li>R$ 8,3M perdidos vs R$ 784k ganhos - taxa de 9.59% precisa melhorar</li>
+<li>Focar nas top 3 (tributário, sdr-inbound, trabalhista) que funcionam</li>
+<li>Revisar/pausar ações com taxa<5% e alto volume de perdidos</li>
+</ul>
+<p><strong>3. PROGRAMA DE INDICAÇÍ•ES:</strong></p>
+<ul>
+<li>"indicacao-cliente" tem 66.67% de conversão - amplificar 5x</li>
+<li>"indicacao-colaborador" gerou R$ 409k - criar sistema de incentivos</li>
+<li>Potencial: R$ 2-3M adicionais com estruturação adequada</li>
+</ul>
+<p><strong>4. AÇÍ•ES PARA REVISAR/PAUSAR:</strong></p>
+<ul>
+<li>programa-indicacao-interno: 3.70% conversão, 26 perdidos</li>
+<li>pro-saude: 6.67% conversão, 14 perdidos</li>
+<li>Analisar custo-benefício de ações com taxa<8% e alto volume de perdidos</li>
+</ul>
+</div>
+</div>
+
+<!-- INBOUND -->
+<div id="inbound" class="tab-content">
+<div class="insight-box">
+<h3>Análise de Marketing (Inbound)</h3>
+<p><strong>Volume:</strong> Responsável por 72% de todas as oportunidades (726 de 1.004)</p>
+<p><strong>Conversão:</strong> Taxa de 10.06% - dentro da média do mercado B2B SaaS (8-15%)</p>
+<p><strong>Receita:</strong> R$ 1,31 milhões - representa 52% da receita total da empresa</p>
+<p><strong>Campanhas Top:</strong>"tributario" (R$ 360k), "sdr-inbound-pagina-pro" (R$ 259k), "marketing-lp-trabalhista" (R$ 181k)</p>
+</div>
+
+<div class="metrics-grid">
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Total Oportunidades</div>
+<div class="metric-value">726</div>
+<div class="metric-change positive">72% do total</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Negócios Ganhos</div>
+<div class="metric-value">73</div>
+<div class="metric-change positive">72% dos ganhos totais</div>
+</div>
+<div class="metric-card neutral">
+<div class="metric-icon"></div>
+<div class="metric-label">Taxa de Conversão</div>
+<div class="metric-value">10.06%</div>
+<div class="metric-change neutral">Meta mercado: 8-15%</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Total</div>
+<div class="metric-value">R$ 1,31M</div>
+<div class="metric-change positive">Ticket: R$ 17.992</div>
+</div>
+</div>
+
+<div class="two-column">
+<div class="chart-container">
+<div class="chart-title">Distribuiçção Inbound</div>
+<canvas id="chartInboundDist"></canvas>
+</div>
+<div class="chart-container">
+<div class="chart-title">Funil de Conversão Inbound</div>
+<canvas id="chartFunilInbound"></canvas>
+</div>
+</div>
+
+<div class="highlight-box">
+<h3>Recomendações para Inbound</h3>
+<p><strong>1. Duplicar esforços nas top 3 campanhas</strong>(tributário, sdr-inbound, trabalhista) que geram 60% da receita</p>
+<p><strong>2. Otimizar conversão de MQL SQL:</strong> Atual ~10%, meta 15% aumentaria receita em ~50%</p>
+<p><strong>3. Replicar estratégia de indicações:</strong>"indicacao-colaborador" e "indicacao-cliente" têm tickets altíssimos (R$ 68k)</p>
+</div>
+</div>
+
+<!-- OUTBOUND -->
+<div id="outbound" class="tab-content">
+<h2 style="color: white; text-align: center; margin-bottom: 30px; font-size: 2.2em;">Relatório de Estratégias de Prospecção (Outbound)</h2>
+<p style="color: white; text-align: center; margin-bottom: 40px; font-size: 1.1em;">Análise Completa de Performance das Ações 2021-2025</p>
+
+<!-- Summary Cards -->
+<div class="metrics-grid">
+<div class="metric-card neutral">
+<div class="metric-icon"></div>
+<div class="metric-label">Total de Ações</div>
+<div class="metric-value">29</div>
+<div class="metric-change neutral">Ações Encerradas</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Prospects Abordados</div>
+<div class="metric-value">7.043</div>
+<div class="metric-change positive">Volume Total</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">MQLs Gerados</div>
+<div class="metric-value">401</div>
+<div class="metric-change positive">Taxa: 6.70%</div>
+</div>
+<div class="metric-card neutral">
+<div class="metric-icon"></div>
+<div class="metric-label">SQLs Qualificados</div>
+<div class="metric-value">203</div>
+<div class="metric-change neutral">Taxa: 28.36%</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Conversões LIVE</div>
+<div class="metric-value">21</div>
+<div class="metric-change positive">Taxa Final: 0.55%</div>
+</div>
+</div>
+
+<!-- Seção: Top 10 Melhores Conversões -->
+<div class="insight-box" style="margin-top: 30px;">
+<h3>Top 10 Ações com Melhor Taxa de Conversão</h3>
+</div>
+ 
+<div class="two-column">
+<div class="chart-container">
+<h3 class="chart-title">Taxa de Conversão Final (%)</h3>
+<canvas id="chartOutboundTop10Conversao"></canvas>
+</div>
+<div class="chart-container">
+<h3 class="chart-title">Volume de Conversões</h3>
+<canvas id="chartOutboundTop10Volume"></canvas>
+</div>
+</div>
+
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Top 10 Estratégias de Melhor Performance</h3>
+<table>
+<thead>
+<tr>
+<th>Posiçção</th>
+<th>Nome da Ação</th>
+<th>Prospects</th>
+<th>MQL</th>
+<th>SQL</th>
+<th>LIVE</th>
+<th>Taxa Conv. Final</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1Âº</strong></td>
+<td>Retomada Tier 2 - 2021</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>1</td>
+<td><strong>12.50%</strong></td>
+<td><span class="badge green">Excepcional</span></td>
+</tr>
+<tr>
+<td><strong>2Âº</strong></td>
+<td>Prospecção Outbound - Retomada Tier 2</td>
+<td>445</td>
+<td>50</td>
+<td>31</td>
+<td>6</td>
+<td><strong>1.35%</strong></td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+<tr>
+<td><strong>3Âº</strong></td>
+<td>Outbound Tier 2 - Lista Chambers</td>
+<td>448</td>
+<td>46</td>
+<td>19</td>
+<td>4</td>
+<td><strong>0.89%</strong></td>
+<td><span class="badge green">Muito Bom</span></td>
+</tr>
+<tr>
+<td><strong>4Âº</strong></td>
+<td>Prospecção MQLs perdidos Jan 2021- Jun 2022</td>
+<td>1000</td>
+<td>42</td>
+<td>41</td>
+<td>4</td>
+<td><strong>0.40%</strong></td>
+<td><span class="badge yellow">Bom</span></td>
+</tr>
+<tr>
+<td><strong>5Âº</strong></td>
+<td>Prospecção clientes INFO sem PRO</td>
+<td>1531</td>
+<td>52</td>
+<td>30</td>
+<td>4</td>
+<td><strong>0.26%</strong></td>
+<td><span class="badge yellow">Bom</span></td>
+</tr>
+<tr>
+<td><strong>6Âº</strong></td>
+<td>PROSPECÇÍO OUTBOUND - LISTA LINKEDIN- T2 - Q4</td>
+<td>450</td>
+<td>54</td>
+<td>18</td>
+<td>1</td>
+<td><strong>0.22%</strong></td>
+<td><span class="badge yellow">Regular</span></td>
+</tr>
+<tr>
+<td><strong>7Âº</strong></td>
+<td>Retomada perdidos PRO Tributos Jan 2021 - Março 2022</td>
+<td>497</td>
+<td>52</td>
+<td>23</td>
+<td>1</td>
+<td><strong>0.20%</strong></td>
+<td><span class="badge yellow">Regular</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="insight-box">
+<h3>Insights - Melhores Conversões</h3>
+<p><strong>1. Retomada é o Grande Vencedor:</strong></p>
+<ul>
+<li>A ação "Retomada Tier 2 - 2021" teve<strong style="color: #ff6b35;">12.50% de conversão</strong>- 22.7x acima da média!</li>
+<li>Pequeno volume (8 prospects) mas 100% viraram MQL e 12.5% fecharam</li>
+<li><strong>Recomendação:</strong> Priorizar ações de retomada com leads qualificados previamente</li>
+</ul>
+<p><strong>2. Lista Chambers Mostra Qualidade:</strong></p>
+<ul>
+<li>448 prospects geraram 4 conversões (0.89%) - acima da média</li>
+<li>Escritórios influentes têm perfil adequado para JOTA PRO</li>
+<li><strong>Recomendação:</strong> Expandir para outras listas de escritórios influentes</li>
+</ul>
+<p><strong>3. Alto Volume   Alta Conversão:</strong></p>
+<ul>
+<li>"Prospecção clientes INFO sem PRO": 1.531 prospects, apenas 0.26% converteu</li>
+<li>Volume compensa baixa taxa, mas há espaço para melhorar qualificação</li>
+<li><strong>Recomendação:</strong> Segmentar melhor a base INFO por setor e tamanho</li>
+</ul>
+</div>
+
+<!-- Seção: Volume de MQLs -->
+<div class="insight-box" style="margin-top: 30px;">
+<h3>Top 10 Ações Geradoras de MQLs</h3>
+</div>
+ 
+<div class="chart-container">
+<h3 class="chart-title">MQLs Gerados por Ação</h3>
+<canvas id="chartOutboundTopMQLs"></canvas>
+</div>
+
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Maiores Geradores de MQLs</h3>
+<table>
+<thead>
+<tr>
+<th>Posiçção</th>
+<th>Nome da Ação</th>
+<th>Prospects</th>
+<th>MQLs Gerados</th>
+<th>Taxa MQL</th>
+<th>Conversões LIVE</th>
+<th>Eficiência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1Âº</strong></td>
+<td>PROSPECÇÍO OUTBOUND - LISTA LINKEDIN- T2 - Q4</td>
+<td>450</td>
+<td><strong>54</strong></td>
+<td>12.00%</td>
+<td>1</td>
+<td><span class="badge green">Alta Geração</span></td>
+</tr>
+<tr>
+<td><strong>2Âº</strong></td>
+<td>Prospecção clientes INFO sem PRO</td>
+<td>1531</td>
+<td><strong>52</strong></td>
+<td>3.40%</td>
+<td>4</td>
+<td><span class="badge yellow">Volume Alto</span></td>
+</tr>
+<tr>
+<td><strong>2Âº</strong></td>
+<td>Retomada perdidos PRO Tributos Jan 2021 - Março 2022</td>
+<td>497</td>
+<td><strong>52</strong></td>
+<td>10.46%</td>
+<td>1</td>
+<td><span class="badge green">Boa Taxa</span></td>
+</tr>
+<tr>
+<td><strong>4Âº</strong></td>
+<td>Prospecção Outbound - Retomada Tier 2</td>
+<td>445</td>
+<td><strong>50</strong></td>
+<td>11.24%</td>
+<td>6</td>
+<td><span class="badge green">Melhor ROI</span></td>
+</tr>
+<tr>
+<td><strong>5Âº</strong></td>
+<td>Outbound Tier 2 - Lista Chambers</td>
+<td>448</td>
+<td><strong>46</strong></td>
+<td>10.27%</td>
+<td>4</td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="insight-box">
+<h3>Insights - Geração de MQLs</h3>
+<p><strong>1. LinkedIn é Campeção em Taxa de MQL:</strong></p>
+<ul>
+<li><strong style="color: #ff6b35;">12% de conversão</strong> de Prospect MQL (quase 2x a média)</li>
+<li>54 MQLs de 450 prospects - equilibrando volume e qualidade</li>
+<li><strong>Recomendação:</strong> Ampliar prospecçção via LinkedIn, testando novos segmentos e personas</li>
+</ul>
+<p><strong>2. Base INFO é Volume Puro:</strong></p>
+<ul>
+<li>1.531 prospects geraram 52 MQLs (taxa baixa de 3.4%)</li>
+<li>Mas converteu 4 clientes - ROI positivo pelo volume</li>
+<li><strong>Recomendação:</strong> Manter ações em base INFO mas com segmentação mais fina</li>
+</ul>
+<p><strong>3. Retomadas Funcionam Muito Bem:</strong></p>
+<ul>
+<li>3 das top 5 ações sção retomadas (taxa média de 10.5%)</li>
+<li>Leads já conhecem o produto = maior engajamento</li>
+<li><strong>Recomendação:</strong> Criar cadência trimestral de retomada para leads perdidos</li>
+</ul>
+</div>
+
+<!-- Seção: Análise por Origem -->
+<div class="insight-box" style="margin-top: 30px;">
+<h3>Performance por Origem da Lista</h3>
+</div>
+ 
+<div class="two-column">
+<div class="chart-container">
+<h3 class="chart-title">Prospects por Origem</h3>
+<canvas id="chartOutboundProspectsPorOrigem"></canvas>
+</div>
+<div class="chart-container">
+<h3 class="chart-title">Taxa de Conversão por Origem</h3>
+<canvas id="chartOutboundConversaoPorOrigem"></canvas>
+</div>
+</div>
+
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Comparativo: Performance por Tipo de Lista</h3>
+<table>
+<thead>
+<tr>
+<th>Origem da Lista</th>
+<th>Prospects</th>
+<th>MQLs</th>
+<th>Conversões LIVE</th>
+<th>Taxa de Conversão Final</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background: rgba(16, 185, 129, 0.1);">
+<td><strong>Retomada</strong></td>
+<td>950</td>
+<td>110</td>
+<td>8</td>
+<td><strong style="color: #10b981; font-size: 1.2em;">4.68%</strong></td>
+<td><span class="badge green">Campeã Absoluta</span></td>
+</tr>
+<tr>
+<td><strong>Lista Externa</strong></td>
+<td>1.606</td>
+<td>151</td>
+<td>5</td>
+<td><strong>0.14%</strong></td>
+<td><span class="badge yellow">Razoável</span></td>
+</tr>
+<tr style="background: rgba(239, 68, 68, 0.1);">
+<td><strong>Lista Interna</strong></td>
+<td>4.487</td>
+<td>140</td>
+<td>8</td>
+<td><strong style="color: #ef4444;">0.04%</strong></td>
+<td><span class="badge red">Precisa Melhorar</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="insight-box">
+<h3>Insights - Análise por Origem</h3>
+<p><strong>1. Retomada é 117x Melhor que Lista Interna:</strong></p>
+<ul>
+<li>Taxa de<strong style="color: #10b981; font-size: 1.1em;">4.68%</strong> vs 0.04% da lista interna</li>
+<li>950 prospects geraram 8 conversões - ROI excepcional</li>
+<li><strong>Recomendação:</strong> Criar processo estruturado de retomada a cada 3-6 meses</li>
+</ul>
+<p><strong>2. Listas Internas Precisam de Qualificação Melhor:</strong></p>
+<ul>
+<li>4.487 prospects mas apenas 0.04% converteram (1 em cada 2.500!)</li>
+<li>140 MQLs gerados mas apenas 8 fechamentos</li>
+<li><strong>Recomendação:</strong> Revisar critérios de segmentação no Pipedrive - focar em fit real</li>
+</ul>
+<p><strong>3. Listas Externas Têm Potencial:</strong></p>
+<ul>
+<li>0.14% de conversão - 3.5x melhor que lista interna</li>
+<li>1.606 prospects geraram 151 MQLs (9.4% - boa taxa!)</li>
+<li><strong>Recomendação:</strong> Investir mais em listas externas qualificadas (anuários, eventos, etc)</li>
+</ul>
+</div>
+
+<!-- Seção: Recomendações Estratégicas -->
+<div class="insight-box" style="margin-top: 30px; background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(247, 147, 30, 0.15) 100%);">
+<h3>Recomendações Estratégicas - Priorização 2025</h3>
+ 
+<div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 20px;">
+<h4 style="color: #10b981; margin-bottom: 15px;">PRIORIDADE MÍXIMA (Implementar Imediatamente)</h4>
+<p><strong>1. Criar Processo Estruturado de Retomada (4.68% conversão):</strong></p>
+<ul style="margin-left: 20px;">
+<li>Retomar leads perdidos a cada 90 dias (janela ideal: 3-18 meses após perda)</li>
+<li>Criar cadência com 3-5 touchpoints (email + LinkedIn + WhatsApp)</li>
+<li>Oferecer algo novo: case de sucesso, feature nova, ou desconto pontual</li>
+<li><strong>Potencial:</strong> Se replicar taxa de 4.68%, cada 1.000 retomadas = 47 conversões</li>
+</ul>
+
+<p style="margin-top: 15px;"><strong>2. Escalar Prospecção via LinkedIn (12% MQL):</strong></p>
+<ul style="margin-left: 20px;">
+<li>Aumentar time de SDRs focados em LinkedIn de 2 para 4 pessoas</li>
+<li>Criar playbook replicável baseado na ação de sucesso Q4/2021</li>
+<li>Segmentar por persona (Marcos Tributário, Patricia Porto, etc) + setor</li>
+<li><strong>Potencial:</strong>2.000 prospects/mês via LinkedIn = 240 MQLs/mês = 5-10 conversões/mês</li>
+</ul>
+
+<p style="margin-top: 15px;"><strong>3. Duplicar Ações com Listas Externas de Qualidade (0.14% vs 0.04%):</strong></p>
+<ul style="margin-left: 20px;">
+<li>Investir em mais listas tipo "Chambers" (influentes, premiados, etc)</li>
+<li>Comprar bases de anuários (Análise Advocacia, Latin Lawyer, etc)</li>
+<li>Participar de mais eventos corporativos para prospectar presencialmente</li>
+<li><strong>Potencial:</strong>3.000 prospects de listas externas = 420 MQLs = 4-5 conversões</li>
+</ul>
+</div>
+
+<div style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+<h4 style="color: #ffc107; margin-bottom: 15px;">ALTA PRIORIDADE (Implementar em Q1)</h4>
+<p><strong>4. Revisar Completamente Segmentação de Listas Internas:</strong></p>
+<ul style="margin-left: 20px;">
+<li> ï¸ Taxa atual de 0.04% é insustentável (4.487 prospects, 8 conversões)</li>
+<li>Criar score de fit baseado em: setor, tamanho, orçamento, dor identificada</li>
+<li>Prospectar apenas empresas com score >70 (vs abordar toda a base)</li>
+<li><strong>Meta:</strong> Aumentar conversão interna de 0.04% para 0.30% (7.5x melhoria)</li>
+</ul>
+
+<p style="margin-top: 15px;"><strong>5. Descontinuar Ações Ineficazes:</strong></p>
+<ul style="margin-left: 20px;">
+<li>Parar de prospectar ex-clientes sem pesquisa de exit prévia</li>
+<li>Nção fazer retomada de leads >24 meses (taxa 0%)</li>
+<li>Evitar campanhas de "nova precificação" sem contexto adicional</li>
+<li><strong>Economia:</strong>700+ horas/ano de SDR realocadas para ações de alta conversão</li>
+</ul>
+</div>
+</div>
+
+<!-- Resumo Executivo -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+<div class="insight-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-left-color: #10b981;">
+<h3 style="color: #10b981;">O que ESTÍ funcionando:</h3>
+<ul>
+<li><strong>Retomada:</strong>4.68% conversão - melhor estratégia</li>
+<li><strong>LinkedIn:</strong>12% taxa MQL, escalável</li>
+<li><strong>Listas Externas:</strong>3.5x melhor que internas</li>
+<li><strong>Volumes hiper-qualificados:</strong>12.5% conversão</li>
+</ul>
+</div>
+
+<div class="insight-box" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%); border-left-color: #ef4444;">
+<h3 style="color: #ef4444;">O que NÍO funciona:</h3>
+<ul>
+<li><strong>Listas Internas:</strong>0.04% inaceitável</li>
+<li><strong>Leads Antigos:</strong>>24 meses = 0%</li>
+<li><strong>Precificação Isolada:</strong>0% engajamento</li>
+<li><strong>SQLVE:</strong>2.96% precisa dobrar</li>
+</ul>
+</div>
+</div>
+
+<div class="metrics-grid" style="margin-top: 30px;">
+<div class="metric-card positive" style="grid-column: span 3;">
+<div class="metric-icon"></div>
+<div class="metric-label">Impacto Potencial 2025</div>
+<div class="metric-value" style="color: #10b981;">+40 a +60</div>
+<div class="metric-change positive">Conversões adicionais/ano implementando as recomendações</div>
+</div>
+<div class="metric-card positive" style="grid-column: span 2;">
+<div class="metric-icon"></div>
+<div class="metric-label">Eficiência Esperada</div>
+<div class="metric-value" style="color: #ff6b35;">0.55% 1.2%</div>
+<div class="metric-change positive">Dobrar a taxa de conversão em 12 meses</div>
+</div>
+</div>
+
+<div class="chart-container" style="margin-top: 30px;">
+<h3 class="chart-title">Projeçção de Impacto - Implementação das Recomendações</h3>
+<canvas id="chartOutboundProjecao"></canvas>
+</div>
+</div>
+
+<!-- METAS 2025 -->
+<div id="metas" class="tab-content">
+<div class="insight-box">
+<h3>Estratégia de Metas 2025</h3>
+<p><strong>Meta Total Anual:</strong>1.550 MQL Grandes Contas + 2.620 MQL SMB =<strong>4.170 MQL</strong></p>
+<p><strong>Distribuiçção Ideal por Canal:</strong>70% Marketing (2.919 MQL) + 30% Prospecção (1.251 MQL)</p>
+<p><strong>Baseado em Performance Real:</strong> Marketing 10.06% conversão | Prospecção 16.67% conversão</p>
+<p><strong>Total Prospects Necessário:</strong>~36.500 (29.016 Marketing + 7.504 Prospecção)</p>
+</div>
+
+<div class="highlight-box">
+<h3>Metas Mensais Ideais por Canal</h3>
+<p><strong>NOVA ESTRATÍ‰GIA:</strong> Distribuiçção 70% Marketing + 30% Prospecção baseada em performance e escalabilidade</p>
+<p><strong>Por que 70/30?</strong></p>
+<ul>
+<li>Marketing: Melhor para volume e escala (taxa 10.06%)</li>
+<li>Prospecção: Melhor ROI e ticket (taxa 16.67%, ticket 2,8x maior)</li>
+<li>Combinação otimiza volume + qualidade + eficiência</li>
+</ul>
+</div>
+
+<div class="chart-container" style="max-height: 400px;">
+<div class="chart-title">Distribuiçção Ideal de Metas por Canal - Visão Anual</div>
+<div style="max-height: 320px;">
+<canvas id="chartMetasCanal"></canvas>
+</div>
+</div>
+
+<div class="two-column">
+<div class="chart-container" style="max-height: 400px;">
+<div class="chart-title">Grandes Contas (T1) - Mix Ideal</div>
+<div style="max-width: 300px; margin: 0 auto;">
+<canvas id="chartT1Mix"></canvas>
+</div>
+<div style="margin-top: 15px; padding: 12px; background: #fff5e6; border-radius: 10px; font-size: 0.9em;">
+<h4 style="color: #ff6b35; margin-bottom: 8px; font-size: 1em;">Detalhes T1</h4>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;"><strong>Meta Anual:</strong>1.550 MQL</p>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;">Marketing:<strong>1.085 MQL</strong>(10.785 prospects)</p>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;">Prospecção:<strong>465 MQL</strong>(2.789 prospects)</p>
+<p style="color: #ff6b35; margin: 8px 0 0 0; font-weight: bold; font-size: 0.95em;">Total: 13.575 prospects/ano</p>
+</div>
+</div>
+<div class="chart-container" style="max-height: 400px;">
+<div class="chart-title">SMB (T2) - Mix Ideal</div>
+<div style="max-width: 300px; margin: 0 auto;">
+<canvas id="chartT2Mix"></canvas>
+</div>
+<div style="margin-top: 15px; padding: 12px; background: #fff5e6; border-radius: 10px; font-size: 0.9em;">
+<h4 style="color: #ff6b35; margin-bottom: 8px; font-size: 1em;">Detalhes T2</h4>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;"><strong>Meta Anual:</strong>2.620 MQL</p>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;">Marketing:<strong>1.834 MQL</strong>(18.231 prospects)</p>
+<p style="color: #ffffff; margin: 3px 0; font-size: 0.95em;">Prospecção:<strong>786 MQL</strong>(4.715 prospects)</p>
+<p style="color: #ff6b35; margin: 8px 0 0 0; font-weight: bold; font-size: 0.95em;">Total: 22.946 prospects/ano</p>
+</div>
+</div>
+</div>
+
+<div class="chart-container" style="max-height: 400px;">
+<div class="chart-title">Evoluçção Trimestral - Grandes Contas vs SMB</div>
+<div style="max-height: 320px;">
+<canvas id="chartEvolucaoTrimestral"></canvas>
+</div>
+</div>
+
+<div class="three-column">
+<div class="comparison-card" style="border: 2px solid #ff6b35; padding: 15px;">
+<h4 style="font-size: 1.1em;">Marketing</h4>
+<div class="comparison-value" style="font-size: 1.8em;">2.919</div>
+<div class="comparison-label" style="font-size: 0.85em;">MQL Ano (70%)</div>
+<div style="margin-top: 15px; text-align: left; font-size: 0.85em; line-height: 1.6;">
+<strong>T1:</strong>1.085 MQL<br>
+<strong>T2:</strong>1.834 MQL<br>
+<strong>Prospects:</strong>29.016<br>
+<strong>Taxa:</strong>10.06%<br>
+<strong>Melhor para:</strong> Volume
+</div>
+</div>
+<div class="comparison-card" style="border: 2px solid #f7931e; padding: 15px;">
+<h4 style="font-size: 1.1em;">Prospecção</h4>
+<div class="comparison-value" style="font-size: 1.8em; color: #f7931e;">1.251</div>
+<div class="comparison-label" style="font-size: 0.85em;">MQL Ano (30%)</div>
+<div style="margin-top: 15px; text-align: left; font-size: 0.85em; line-height: 1.6;">
+<strong>T1:</strong>465 MQL<br>
+<strong>T2:</strong>786 MQL<br>
+<strong>Prospects:</strong>7.504<br>
+<strong>Taxa:</strong>16.67%<br>
+<strong>Melhor para:</strong> ROI
+</div>
+</div>
+<div class="comparison-card" style="border: 2px solid #10b981; padding: 15px;">
+<h4 style="font-size: 1.1em;">Total</h4>
+<div class="comparison-value" style="font-size: 1.8em; color: #10b981;">4.170</div>
+<div class="comparison-label" style="font-size: 0.85em;">MQL Ano</div>
+<div style="margin-top: 15px; text-align: left; font-size: 0.85em; line-height: 1.6;">
+<strong>T1:</strong>1.550 MQL<br>
+<strong>T2:</strong>2.620 MQL<br>
+<strong>Prospects:</strong>36.520<br>
+<strong>Mix:</strong>70/30<br>
+<strong>Estratégia:</strong> Otimizada
+</div>
+</div>
+</div>
+
+<div class="metrics-grid">
+<div class="metric-card positive">
+<div class="metric-label">Meta Anual - Grandes Contas</div>
+<div class="metric-value">1.550</div>
+<div class="metric-change positive">1.085 Mkt + 465 Prosp</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-label">Meta Anual - SMB</div>
+<div class="metric-value">2.620</div>
+<div class="metric-change positive">1.834 Mkt + 786 Prosp</div>
+</div>
+<div class="metric-card neutral">
+<div class="metric-label">Prospects Ano - Marketing</div>
+<div class="metric-value">29.016</div>
+<div class="metric-change neutral">70% do volume (10.06% taxa)</div>
+</div>
+<div class="metric-card neutral">
+<div class="metric-label">Prospects Ano - Prospecção</div>
+<div class="metric-value">7.504</div>
+<div class="metric-change neutral">30% volume (16.67% taxa)</div>
+</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Distribuiçção Trimestral de Metas 2025</div>
+<canvas id="chartMetasTrimestre"></canvas>
+</div>
+
+<div class="table-container">
+<div class="chart-title">Metas Mensais Detalhadas - Grandes Contas (T1)</div>
+<table>
+<thead>
+<tr>
+<th>Mês</th>
+<th>Meta MQL</th>
+<th>Meta Trimestral</th>
+<th>Prospects Inbound</th>
+<th>Prospects Outbound</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Janeiro 2025</strong></td>
+<td>150</td>
+<td rowspan="3">450 (Q1)</td>
+<td>1.492</td>
+<td>1.261</td>
+<td><span class="badge blue">Planejamento</span></td>
+</tr>
+<tr>
+<td><strong>Fevereiro 2025</strong></td>
+<td>150</td>
+<td>1.492</td>
+<td>1.261</td>
+<td><span class="badge blue">Planejamento</span></td>
+</tr>
+<tr>
+<td><strong>Março 2025</strong></td>
+<td>150</td>
+<td>1.492</td>
+<td>1.261</td>
+<td><span class="badge blue">Planejamento</span></td>
+</tr>
+<tr style="background: rgba(255, 255, 255, 0.02);">
+<td colspan="6"><strong>Q2 2025</strong></td>
+</tr>
+<tr>
+<td><strong>Abril 2025</strong></td>
+<td>167</td>
+<td rowspan="3">500 (Q2)</td>
+<td>1.660</td>
+<td>1.403</td>
+<td><span class="badge blue">Planejado</span></td>
+</tr>
+<tr>
+<td><strong>Maio 2025</strong></td>
+<td>167</td>
+<td>1.660</td>
+<td>1.403</td>
+<td><span class="badge blue">Planejado</span></td>
+</tr>
+<tr>
+<td><strong>Junho 2025</strong></td>
+<td>166</td>
+<td>1.650</td>
+<td>1.395</td>
+<td><span class="badge blue">Planejado</span></td>
+</tr>
+<tr style="background: rgba(255, 255, 255, 0.02);">
+<td colspan="6"><strong>Q3 e Q4 2025</strong></td>
+</tr>
+<tr>
+<td><strong>Jul-Dez 2025</strong></td>
+<td>100/mês</td>
+<td>300 cada (Q3/Q4)</td>
+<td>995/mês</td>
+<td>840/mês</td>
+<td><span class="badge blue">Planejado</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="table-container">
+<div class="chart-title">NOVA: Metas Mensais por Canal - Grandes Contas (T1)</div>
+<table>
+<thead>
+<tr>
+<th>Trimestre</th>
+<th>Mês</th>
+<th>Meta Total</th>
+<th>Marketing (70%)</th>
+<th>Prospecção (30%)</th>
+<th>Prospects Mkt</th>
+<th>Prospects Prosp</th>
+<th>Total Prospects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="3"><strong>Q1 2025</strong></td>
+<td>Janeiro</td>
+<td>150</td>
+<td><strong>105</strong></td>
+<td><strong>45</strong></td>
+<td>1.044</td>
+<td>270</td>
+<td>1.314</td>
+</tr>
+<tr>
+<td>Fevereiro</td>
+<td>150</td>
+<td><strong>105</strong></td>
+<td><strong>45</strong></td>
+<td>1.044</td>
+<td>270</td>
+<td>1.314</td>
+</tr>
+<tr>
+<td>Março</td>
+<td>150</td>
+<td><strong>105</strong></td>
+<td><strong>45</strong></td>
+<td>1.044</td>
+<td>270</td>
+<td>1.314</td>
+</tr>
+<tr style="background: #fff5e6;">
+<td colspan="2"><strong>Subtotal Q1</strong></td>
+<td><strong>450</strong></td>
+<td><strong>315</strong></td>
+<td><strong>135</strong></td>
+<td>3.132</td>
+<td>810</td>
+<td>3.942</td>
+</tr>
+<tr>
+<td rowspan="3"><strong>Q2 2025</strong></td>
+<td>Abril</td>
+<td>167</td>
+<td><strong>117</strong></td>
+<td><strong>50</strong></td>
+<td>1.160</td>
+<td>300</td>
+<td>1.460</td>
+</tr>
+<tr>
+<td>Maio</td>
+<td>167</td>
+<td><strong>117</strong></td>
+<td><strong>50</strong></td>
+<td>1.160</td>
+<td>300</td>
+<td>1.460</td>
+</tr>
+<tr>
+<td>Junho</td>
+<td>166</td>
+<td><strong>116</strong></td>
+<td><strong>50</strong></td>
+<td>1.153</td>
+<td>300</td>
+<td>1.453</td>
+</tr>
+<tr style="background: #fff5e6;">
+<td colspan="2"><strong>Subtotal Q2</strong></td>
+<td><strong>500</strong></td>
+<td><strong>350</strong></td>
+<td><strong>150</strong></td>
+<td>3.473</td>
+<td>900</td>
+<td>4.373</td>
+</tr>
+<tr>
+<td><strong>Q3 2025</strong></td>
+<td>Jul-Set</td>
+<td>100/mês</td>
+<td><strong>70/mês</strong></td>
+<td><strong>30/mês</strong></td>
+<td>696/mês</td>
+<td>180/mês</td>
+<td>876/mês</td>
+</tr>
+<tr>
+<td><strong>Q4 2025</strong></td>
+<td>Out-Dez</td>
+<td>100/mês</td>
+<td><strong>70/mês</strong></td>
+<td><strong>30/mês</strong></td>
+<td>696/mês</td>
+<td>180/mês</td>
+<td>876/mês</td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top: 15px; color: #ff6b35; font-size: 0.9em; font-weight: bold;">
+ Distribuiçção 70/30 otimiza volume (Marketing) + qualidade (Prospecção)
+</p>
+</div>
+
+<div class="table-container">
+<div class="chart-title">Metas Mensais Detalhadas - SMB (T2)</div>
+<table>
+<thead>
+<tr>
+<th>Trimestre</th>
+<th>Meta MQL Mensal</th>
+<th>Meta Trimestral</th>
+<th>Prospects Inbound</th>
+<th>Prospects Outbound</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Q1 2025</strong></td>
+<td>223/mês</td>
+<td>670</td>
+<td>2.218</td>
+<td>1.874</td>
+</tr>
+<tr>
+<td><strong>Q2 2025</strong></td>
+<td>217/mês</td>
+<td>650</td>
+<td>2.158</td>
+<td>1.824</td>
+</tr>
+<tr>
+<td><strong>Q3 2025</strong></td>
+<td>217/mês</td>
+<td>650</td>
+<td>2.158</td>
+<td>1.824</td>
+</tr>
+<tr>
+<td><strong>Q4 2025</strong></td>
+<td>217/mês</td>
+<td>650</td>
+<td>2.158</td>
+<td>1.824</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="table-container">
+<div class="chart-title">NOVA: Metas Mensais por Canal - SMB (T2)</div>
+<table>
+<thead>
+<tr>
+<th>Trimestre</th>
+<th>Mês</th>
+<th>Meta Total</th>
+<th>Marketing (70%)</th>
+<th>Prospecção (30%)</th>
+<th>Prospects Mkt</th>
+<th>Prospects Prosp</th>
+<th>Total Prospects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="3"><strong>Q1 2025</strong></td>
+<td>Janeiro</td>
+<td>223</td>
+<td><strong>156</strong></td>
+<td><strong>67</strong></td>
+<td>1.554</td>
+<td>402</td>
+<td>1.956</td>
+</tr>
+<tr>
+<td>Fevereiro</td>
+<td>223</td>
+<td><strong>156</strong></td>
+<td><strong>67</strong></td>
+<td>1.554</td>
+<td>402</td>
+<td>1.956</td>
+</tr>
+<tr>
+<td>Março</td>
+<td>224</td>
+<td><strong>157</strong></td>
+<td><strong>67</strong></td>
+<td>1.560</td>
+<td>402</td>
+<td>1.962</td>
+</tr>
+<tr style="background: #fff5e6;">
+<td colspan="2"><strong>Subtotal Q1</strong></td>
+<td><strong>670</strong></td>
+<td><strong>469</strong></td>
+<td><strong>201</strong></td>
+<td>4.668</td>
+<td>1.206</td>
+<td>5.874</td>
+</tr>
+<tr>
+<td rowspan="3"><strong>Q2 2025</strong></td>
+<td>Abril</td>
+<td>217</td>
+<td><strong>152</strong></td>
+<td><strong>65</strong></td>
+<td>1.508</td>
+<td>390</td>
+<td>1.898</td>
+</tr>
+<tr>
+<td>Maio</td>
+<td>217</td>
+<td><strong>152</strong></td>
+<td><strong>65</strong></td>
+<td>1.508</td>
+<td>390</td>
+<td>1.898</td>
+</tr>
+<tr>
+<td>Junho</td>
+<td>216</td>
+<td><strong>151</strong></td>
+<td><strong>65</strong></td>
+<td>1.502</td>
+<td>390</td>
+<td>1.892</td>
+</tr>
+<tr style="background: #fff5e6;">
+<td colspan="2"><strong>Subtotal Q2</strong></td>
+<td><strong>650</strong></td>
+<td><strong>455</strong></td>
+<td><strong>195</strong></td>
+<td>4.518</td>
+<td>1.170</td>
+<td>5.688</td>
+</tr>
+<tr>
+<td><strong>Q3 2025</strong></td>
+<td>Jul-Set</td>
+<td>217/mês</td>
+<td><strong>152/mês</strong></td>
+<td><strong>65/mês</strong></td>
+<td>1.508/mês</td>
+<td>390/mês</td>
+<td>1.898/mês</td>
+</tr>
+<tr>
+<td><strong>Q4 2025</strong></td>
+<td>Out-Dez</td>
+<td>217/mês</td>
+<td><strong>152/mês</strong></td>
+<td><strong>65/mês</strong></td>
+<td>1.508/mês</td>
+<td>390/mês</td>
+<td>1.898/mês</td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top: 15px; color: #ff6b35; font-size: 0.9em; font-weight: bold;">
+ SMB: Foco em volume via Marketing mantendo prospecçção para contas de maior valor
+</p>
+</div>
+
+<div class="highlight-box">
+<h3>Plano de Ação para Atingir Metas</h3>
+<p><strong>Inbound (70% das metas):</strong></p>
+<ul>
+<li>Escalar top 5 campanhas que já convertem bem</li>
+<li>Investir em SEO para aumentar orgânico qualificado</li>
+<li>Criar programa estruturado de indicações (referências convertem 2-3x melhor)</li>
+</ul>
+<p><strong>Outbound (20% das metas):</strong></p>
+<ul>
+<li>Aumentar volume de prospecçção de 84 para ~200 oportunidades/trimestre</li>
+<li>Focar em contas de maior ticket (aproveitando R$ 25k médio)</li>
+<li>Implementar cadências automatizadas para escalar sem perder qualidade</li>
+</ul>
+<p><strong>Orgânico (10% das metas):</strong></p>
+<ul>
+<li>Amplificar presença em eventos e networking</li>
+<li>Content marketing para posicionar liderança</li>
+<li>Parcerias estratégicas com escritórios e associações</li>
+</ul>
+</div>
+</div>
+
+<!-- CAMPANHAS -->
+<div id="campanhas" class="tab-content">
+<div class="insight-box">
+<h3>Top Performers - Análise de Campanhas</h3>
+<p><strong>Destaque Absoluto:</strong> Programa de indicações (colaborador + cliente) gerou R$ 809k com apenas 12 deals!</p>
+<p><strong>Melhor Volume:</strong>"tributario" - 18 negócios fechados totalizando R$ 360k</p>
+<p><strong>Melhor Conversão:</strong> Listas LinkedIn segmentadas (Seligman) - tickets de R$ 60k+</p>
+</div>
+
+<div class="table-container">
+<div class="chart-title">Top 15 Campanhas por Receita</div>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Campanha/Origem</th>
+<th>Qtd Ganhos</th>
+<th>Receita Total</th>
+<th>Ticket Médio</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background: #d1fae5;">
+<td></td>
+<td><strong>indicacao-colaborador</strong></td>
+<td>6</td>
+<td><strong>R$ 409.216</strong></td>
+<td><strong>R$ 68.203</strong></td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+<tr style="background: #d1fae5;">
+<td></td>
+<td><strong>indicacao-cliente</strong></td>
+<td>6</td>
+<td><strong>R$ 399.879</strong></td>
+<td><strong>R$ 66.647</strong></td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>tributario</strong></td>
+<td>18</td>
+<td>R$ 360.168</td>
+<td>R$ 20.009</td>
+<td><span class="badge green">Excelente</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td>sdr-inbound-pagina-pro</td>
+<td>17</td>
+<td>R$ 258.706</td>
+<td>R$ 15.218</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>5</td>
+<td>marketing-lp-conversao-jota-pro-trabalhista</td>
+<td>9</td>
+<td>R$ 181.364</td>
+<td>R$ 20.152</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Zendesk Comercial</td>
+<td>6</td>
+<td>R$ 105.660</td>
+<td>R$ 17.610</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>7</td>
+<td>lista-linkedin-seligman-empresas-escala6x1</td>
+<td>1</td>
+<td>R$ 68.400</td>
+<td>R$ 68.400</td>
+<td><span class="badge green">Alto Ticket</span></td>
+</tr>
+<tr>
+<td>8</td>
+<td>lista-leads-linkedin-seligman-trabalhista</td>
+<td>1</td>
+<td>R$ 61.812</td>
+<td>R$ 61.812</td>
+<td><span class="badge green">Alto Ticket</span></td>
+</tr>
+<tr>
+<td>9</td>
+<td>programa-indicacao-interno</td>
+<td>1</td>
+<td>R$ 48.240</td>
+<td>R$ 48.240</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>10</td>
+<td>pro-saude</td>
+<td>1</td>
+<td>R$ 46.800</td>
+<td>R$ 46.800</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>11</td>
+<td>22-01-2025-rdstation-jota-pro-geral</td>
+<td>3</td>
+<td>R$ 35.868</td>
+<td>R$ 11.956</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>12</td>
+<td>07-05-2025-rdstation-lp-call-saude-1505</td>
+<td>1</td>
+<td>R$ 33.708</td>
+<td>R$ 33.708</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>13</td>
+<td>26-11-2024-rdstation-lp-call-saude-suplementar</td>
+<td>1</td>
+<td>R$ 33.288</td>
+<td>R$ 33.288</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Recuperado</td>
+<td>1</td>
+<td>R$ 32.243</td>
+<td>R$ 32.243</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+<tr>
+<td>15</td>
+<td>07-11-2024-rdstation-lp-midia-paga-poder</td>
+<td>1</td>
+<td>R$ 31.800</td>
+<td>R$ 31.800</td>
+<td><span class="badge blue">Bom</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="two-column">
+<div class="chart-container">
+<div class="chart-title">Top 10 por Receita</div>
+<canvas id="chartTop10Receita"></canvas>
+</div>
+<div class="chart-container">
+<div class="chart-title">Top 10 por Volume</div>
+<canvas id="chartTop10Volume"></canvas>
+</div>
+</div>
+
+<div class="highlight-box">
+<h3>Recomendações Baseadas em Top Campanhas</h3>
+<p><strong>1. Escalar Programa de Indicações:</strong></p>
+<ul>
+<li>Investir 3x mais em incentivos para indicações (colaborador + cliente)</li>
+<li>ROI comprovado: R$ 809k com apenas 12 deals</li>
+<li>Ticket médio de R$ 67k (3,7x maior que média geral)</li>
+</ul>
+<p><strong>2. Ampliar Campanhas "Tributário" e "Trabalhista":</strong></p>
+<ul>
+<li>Juntas geraram R$ 541k (21% da receita total)</li>
+<li>Alto volume (27 deals) com conversão consistente</li>
+<li>Criar variações segmentadas por sub-nicho</li>
+</ul>
+<p><strong>3. Replicar Estratégia LinkedIn:</strong></p>
+<ul>
+<li>Listas segmentadas (Seligman) têm ticket médio de R$ 65k</li>
+<li>Baixo volume mas altíssima qualidade</li>
+<li>Escalar para 10-20 contas/mês vs 1-2 atual</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- T1 - ANÍLISE DETALHADA -->
+<div id="tier1-detalhado" class="tab-content">
+<div class="container">
+<h2 style="color: white; margin-bottom: 30px;">Grandes Contas (T1) - Análise Detalhada por Origem</h2>
+ 
+<!-- Resumo T1 -->
+<div class="metrics-grid">
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Total de Negócios T1</div>
+<div class="metric-value">241</div>
+<div class="metric-change positive">100% do segmento</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Negócios Ganhos</div>
+<div class="metric-value">29</div>
+<div class="metric-change positive">Taxa de Conversão: 12.03%</div>
+</div>
+<div class="metric-card negative">
+<div class="metric-icon"></div>
+<div class="metric-label">Negócios Perdidos</div>
+<div class="metric-value">211</div>
+<div class="metric-change negative">87.55% de perda</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Ganha</div>
+<div class="metric-value">R$ 1.55M</div>
+<div class="metric-change positive">Ticket médio: R$ 53.3k</div>
+</div>
+<div class="metric-card negative">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Perdida</div>
+<div class="metric-value">R$ 8.70M</div>
+<div class="metric-change negative">Oportunidade nção capturada</div>
+</div>
+</div>
+
+<!-- Gráficos T1 -->
+<div class="two-column">
+<div class="chart-container">
+<h3 class="chart-title">Negócios Ganhos por Origem</h3>
+<canvas id="chartT1GanhosOrigem"></canvas>
+</div>
+<div class="chart-container">
+<h3 class="chart-title">Negócios Perdidos por Origem</h3>
+<canvas id="chartT1PerdidosOrigem"></canvas>
+</div>
+</div>
+
+<!-- Tabela Detalhada T1 Ganhos -->
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Negócios Ganhos T1</h3>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Quantidade</th>
+<th>% do Total de Ganhos</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Outbound Orgânico</td>
+<td><strong>13</strong></td>
+<td>44.83%</td>
+<td><span class="badge green">Top Performer</span></td>
+</tr>
+<tr>
+<td>Inbound</td>
+<td><strong>10</strong></td>
+<td>34.48%</td>
+<td><span class="badge blue">Alta Performance</span></td>
+</tr>
+<tr>
+<td>Outbound Prospecção</td>
+<td><strong>4</strong></td>
+<td>13.79%</td>
+<td><span class="badge yellow">Médio</span></td>
+</tr>
+<tr>
+<td>Renovação</td>
+<td><strong>2</strong></td>
+<td>6.90%</td>
+<td><span class="badge blue">Retençção</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- Tabela Detalhada T1 Perdidos -->
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Negócios Perdidos T1</h3>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Quantidade</th>
+<th>% do Total de Perdidos</th>
+<th>Valor Perdido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inbound</td>
+<td><strong>123</strong></td>
+<td>58.29%</td>
+<td>~R$ 5.07M</td>
+</tr>
+<tr>
+<td>Outbound Prospecção</td>
+<td><strong>57</strong></td>
+<td>27.01%</td>
+<td>~R$ 2.35M</td>
+</tr>
+<tr>
+<td>Outbound Orgânico</td>
+<td><strong>29</strong></td>
+<td>13.74%</td>
+<td>~R$ 1.20M</td>
+</tr>
+<tr>
+<td>Quase-Inbound</td>
+<td><strong>2</strong></td>
+<td>0.95%</td>
+<td>~R$ 83k</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- Insights T1 -->
+<div class="insight-box">
+<h3>Insights Estratégicos - Grandes Contas (T1)</h3>
+<p><strong>1. Outbound Orgânico é o Campeção em T1:</strong></p>
+<ul>
+<li>44.83% dos ganhos vêm de Outbound Orgânico (13 deals)</li>
+<li>Estratégia: Relacionamento direto e networking qualificado</li>
+<li><strong>Recomendação:</strong> Aumentar investimento em ações de networking e parcerias estratégicas</li>
+</ul>
+<p><strong>2. Inbound tem Maior Volume de Perdas:</strong></p>
+<ul>
+<li>123 negócios perdidos (58.29%), representando R$ 5.07M nção capturados</li>
+<li>Possível problema de qualificação ou maturidade dos leads</li>
+<li><strong>Recomendação:</strong> Revisar processo de qualificação MQL SQL para grandes contas</li>
+</ul>
+<p><strong>3. Outbound Prospecção: Alta Perda vs Ganho:</strong></p>
+<ul>
+<li>Apenas 4 ganhos vs 57 perdidos (conversão de 6.56%)</li>
+<li>R$ 2.35M em oportunidades perdidas</li>
+<li><strong>Recomendação:</strong> Aprimorar script de prospecçção e timing de abordagem para grandes contas</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- T2 - ANÍLISE DETALHADA -->
+<div id="tier2-detalhado" class="tab-content">
+<div class="container">
+<h2 style="color: white; margin-bottom: 30px;">SMB - Tier 2 (T2) - Análise Detalhada por Origem</h2>
+ 
+<!-- Resumo T2 -->
+<div class="metrics-grid">
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Total de Negócios T2</div>
+<div class="metric-value">749</div>
+<div class="metric-change positive">100% do segmento</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Negócios Ganhos</div>
+<div class="metric-value">72</div>
+<div class="metric-change positive">Taxa de Conversão: 9.61%</div>
+</div>
+<div class="metric-card negative">
+<div class="metric-icon"></div>
+<div class="metric-label">Negócios Perdidos</div>
+<div class="metric-value">561</div>
+<div class="metric-change negative">74.90% de perda</div>
+</div>
+<div class="metric-card positive">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Ganha</div>
+<div class="metric-value">R$ 963k</div>
+<div class="metric-change positive">Ticket médio: R$ 13.4k</div>
+</div>
+<div class="metric-card negative">
+<div class="metric-icon"></div>
+<div class="metric-label">Receita Perdida</div>
+<div class="metric-value">R$ 8.72M</div>
+<div class="metric-change negative">Oportunidade nção capturada</div>
+</div>
+</div>
+
+<!-- Gráficos T2 -->
+<div class="two-column">
+<div class="chart-container">
+<h3 class="chart-title">Negócios Ganhos por Origem</h3>
+<canvas id="chartT2GanhosOrigem"></canvas>
+</div>
+<div class="chart-container">
+<h3 class="chart-title">Negócios Perdidos por Origem</h3>
+<canvas id="chartT2PerdidosOrigem"></canvas>
+</div>
+</div>
+
+<!-- Tabela Detalhada T2 Ganhos -->
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Negócios Ganhos T2</h3>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Quantidade</th>
+<th>% do Total de Ganhos</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inbound</td>
+<td><strong>63</strong></td>
+<td>87.50%</td>
+<td><span class="badge green">Dominante</span></td>
+</tr>
+<tr>
+<td>Outbound Prospecção</td>
+<td><strong>6</strong></td>
+<td>8.33%</td>
+<td><span class="badge yellow">Complementar</span></td>
+</tr>
+<tr>
+<td>Renovação</td>
+<td><strong>2</strong></td>
+<td>2.78%</td>
+<td><span class="badge blue">Retençção</span></td>
+</tr>
+<tr>
+<td>Outbound Orgânico</td>
+<td><strong>1</strong></td>
+<td>1.39%</td>
+<td><span class="badge orange">Baixo</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- Tabela Detalhada T2 Perdidos -->
+<div class="table-container">
+<h3 style="margin-bottom: 20px;">Detalhamento: Negócios Perdidos T2</h3>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Quantidade</th>
+<th>% do Total de Perdidos</th>
+<th>Valor Perdido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inbound</td>
+<td><strong>527</strong></td>
+<td>93.94%</td>
+<td>~R$ 8.19M</td>
+</tr>
+<tr>
+<td>Outbound Prospecção</td>
+<td><strong>17</strong></td>
+<td>3.03%</td>
+<td>~R$ 264k</td>
+</tr>
+<tr>
+<td>Outbound Orgânico</td>
+<td><strong>16</strong></td>
+<td>2.85%</td>
+<td>~R$ 249k</td>
+</tr>
+<tr>
+<td>Inbound, Outbound Orgânico</td>
+<td><strong>1</strong></td>
+<td>0.18%</td>
+<td>~R$ 16k</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- Comparativo Ganho vs Perdido T2 -->
+<div class="chart-container">
+<h3 class="chart-title">Comparativo: Taxa de Conversão por Origem T2</h3>
+<canvas id="chartT2ConversaoOrigem"></canvas>
+</div>
+
+<!-- Insights T2 -->
+<div class="insight-box">
+<h3>Insights Estratégicos - SMB Tier 2 (T2)</h3>
+<p><strong>1. Inbound Domina Completamente em T2:</strong></p>
+<ul>
+<li>87.50% dos ganhos (63 de 72 deals) vêm de Inbound</li>
+<li>Canal mais escalável e previsível para SMB</li>
+<li><strong>Recomendação:</strong> Dobrar investimento em campanhas de Inbound (SEO, PPC, Content Marketing)</li>
+</ul>
+<p><strong>2. Volume Massivo de Perdas em Inbound:</strong></p>
+<ul>
+<li>527 negócios perdidos (93.94%), representando R$ 8.19M nção capturados</li>
+<li>Taxa de conversão de apenas 10.68% (63 ganhos / 590 total Inbound)</li>
+<li><strong>Recomendação:</strong> Implementar nurturing automatizado e melhorar qualificação de leads SMB</li>
+</ul>
+<p><strong>3. Outbound tem Baixíssima Performance em T2:</strong></p>
+<ul>
+<li>Outbound Prospecção: apenas 6 ganhos vs 17 perdidos (26.09% conversão)</li>
+<li>Outbound Orgânico: apenas 1 ganho vs 16 perdidos (5.88% conversão)</li>
+<li><strong>Recomendação:</strong> Reavaliar estratégia de Outbound para SMB ou descontinuar para focar em Inbound</li>
+</ul>
+<p><strong>4. Diferença de Ticket Médio:</strong></p>
+<ul>
+<li>T2 ticket médio: R$ 13.4k (vs R$ 53.3k em T1)</li>
+<li>Volume compensa: 72 ganhos em T2 vs 29 em T1 (2.48x mais)</li>
+<li><strong>Recomendação:</strong> Escalar volume de Inbound para maximizar receita total em SMB</li>
+</ul>
+</div>
+</div>
+</div>
+
+<script>
+ function openTab(tabName) {
+ const tabContents = document.querySelectorAll('.tab-content');
+ const tabButtons = document.querySelectorAll('.tab-button');
+ 
+ tabContents.forEach(content =>content.classList.remove('active'));
+ tabButtons.forEach(button =>button.classList.remove('active'));
+ 
+ document.getElementById(tabName).classList.add('active');
+ event.target.classList.add('active');
+ }
+
+ // Dados reais
+ const dadosReais = {
+ inbound: { total: 726, ganhos: 73, taxa: 10.06, receita: 1313428, ticket: 17992 },
+ outbound: { total: 84, ganhos: 10, taxa: 11.90, receita: 251388, ticket: 25139 },
+ orgânicoanico: { total: 61, ganhos: 14, taxa: 23.33, receita: 887335, ticket: 63381 },
+ grandesContas: { total: 241, ganhos: 29, taxa: 12.08, receita: 1546351 },
+ smb: { total: 749, ganhos: 72, taxa: 11.37, receita: 962948 }
+ };
+
+ // Chart 1: Origem Geral
+
+ // ===== AGUARDAR DOM CARREGAR =====
+ document.addEventListener("DOMContentLoaded", function() {
+
+ // ========================================================
+ // VERIFICAÇÍO: Chart.js carregou?
+ // ========================================================
+ if (typeof Chart === 'undefined') {
+ console.error(' ERRO CRÍTICO: Chart.js nção foi carregado!');
+ console.error(' Verifique sua conexção com a internet.');
+ console.error(' URL: https://cdn.jsdelivr.net/npm/chart.js');
+ alert('Erro: Chart.js nção carregou. Verifique sua conexção com a internet.');
+ return; // Para a execuçção
+ } else {
+ console.log(' Chart.js carregado com sucesso! Versção:', Chart.version);
+ }
+ 
+
+
+ // Funçção para criar gráficos com proteçção
+ function createChartSafe(canvasId, config) {
+ const canvas = document.getElementById(canvasId);
+ if (!canvas) {
+ console.error(' Canvas nção encontrado:', canvasId);
+ return null;
+ }
+ 
+ try {
+ console.log(' Criando gráfico:', canvasId);
+ const chart = new Chart(canvas, config);
+ console.log(' Gráfico criado:', canvasId);
+ return chart;
+ } catch (error) {
+ console.error(' Erro ao criar gráfico', canvasId, ':', error);
+ return null;
+ }
+ }
+
+
+ console.log(" DOM carregado! Criando gráficos...");
+
+ createChartSafe('chartOrigemGeral', {
+ type: 'bar',
+ data: {
+ labels: ['Inbound', 'Outbound', 'Orgânico'],
+ datasets: [{
+ label: 'Total Oportunidades',
+ data: [726, 84, 61],
+ backgroundColor: 'rgba(102, 126, 234, 0.8)',
+ borderColor: 'rgba(102, 126, 234, 1)',
+ borderWidth: 2
+ }, {
+ label: 'Negócios Ganhos',
+ data: [73, 10, 14],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)',
+ borderColor: 'rgba(16, 185, 129, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ scales: { y: { beginAtZero: true } }
+ }
+ });
+
+ // Chart 2: Segmento Geral
+ createChartSafe('chartSegmentoGeral', {
+ type: 'doughnut',
+ data: {
+ labels: ['Grandes Contas', 'SMB'],
+ datasets: [{
+ data: [29, 72],
+ backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(59, 130, 246, 0.8)']
+ }]
+ },
+ options: { responsive: true }
+ });
+
+ // Chart 3: Comparativo Completo
+ createChartSafe('chartComparativoCompleto', {
+ type: 'bar',
+ data: {
+ labels: ['Inbound', 'Outbound', 'Orgânico'],
+ datasets: [{
+ label: 'Taxa de Conversão (%)',
+ data: [10.06, 11.90, 23.33],
+ backgroundColor: 'rgba(59, 130, 246, 0.8)',
+ yAxisID: 'y'
+ }, {
+ label: 'Ticket Médio (R$ mil)',
+ data: [17.99, 25.14, 63.38],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)',
+ yAxisID: 'y1'
+ }]
+ },
+ options: {
+ responsive: true,
+ scales: {
+ y: { type: 'linear', position: 'left', beginAtZero: true },
+ y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } }
+ }
+ }
+ });
+
+ // Chart 4: Receita por Origem
+ createChartSafe('chartReceitaOrigem', {
+ type: 'pie',
+ data: {
+ labels: ['Inbound', 'Outbound', 'Orgânico'],
+ datasets: [{
+ data: [1313428, 251388, 887335],
+ backgroundColor: ['rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(16, 185, 129, 0.8)']
+ }]
+ },
+ options: { responsive: true }
+ });
+
+ // Chart 5: Ticket Médio
+ createChartSafe('chartTicketOrigem', {
+ type: 'bar',
+ data: {
+ labels: ['Orgânico', 'Outbound', 'Inbound'],
+ datasets: [{
+ label: 'Ticket Médio (R$)',
+ data: [63381, 25139, 17992],
+ backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(102, 126, 234, 0.8)']
+ }]
+ },
+ options: {
+ responsive: true,
+ indexAxis: 'y',
+ scales: { x: { beginAtZero: true } }
+ }
+ });
+
+ // Chart 6: Comparativo Detalhado
+ createChartSafe('chartComparativoDetalhado', {
+ type: 'radar',
+ data: {
+ labels: ['Volume', 'Taxa Conversão', 'Ticket Médio', 'Receita Total', 'Qualidade'],
+ datasets: [{
+ label: 'Inbound',
+ data: [100, 43, 28, 52, 50],
+ borderColor: 'rgba(102, 126, 234, 1)',
+ backgroundColor: 'rgba(102, 126, 234, 0.2)'
+ }, {
+ label: 'Outbound',
+ data: [12, 51, 40, 10, 60],
+ borderColor: 'rgba(118, 75, 162, 1)',
+ backgroundColor: 'rgba(118, 75, 162, 0.2)'
+ }, {
+ label: 'Orgânico',
+ data: [8, 100, 100, 35, 100],
+ borderColor: 'rgba(16, 185, 129, 1)',
+ backgroundColor: 'rgba(16, 185, 129, 0.2)'
+ }]
+ },
+ options: { responsive: true }
+ });
+
+ // Chart 7: Inbound Distribution
+ createChartSafe('chartInboundDist', {
+ type: 'pie',
+ data: {
+ labels: ['Ganho', 'Perdido', 'Em Aberto'],
+ datasets: [{
+ data: [73, 653, 0],
+ backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(156, 163, 175, 0.8)']
+ }]
+ }
+ });
+
+ // Chart 8: Funil Inbound
+ createChartSafe('chartFunilInbound', {
+ type: 'bar',
+ data: {
+ labels: ['Oportunidades', 'Fechados', 'Ganhos'],
+ datasets: [{
+ data: [726, 726, 73],
+ backgroundColor: ['rgba(102, 126, 234, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)']
+ }]
+ }
+ });
+
+ // Chart 9: Outbound Performance - REMOVIDO (canvas nção existe)
+
+ // Chart 10: Outbound Comp - REMOVIDO (canvas nção existe)
+
+ // Chart 11: Metas Trimestre
+ createChartSafe('chartMetasTrimestre', {
+ type: 'bar',
+ data: {
+ labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+ datasets: [{
+ label: 'Grandes Contas',
+ data: [450, 500, 300, 300],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)'
+ }, {
+ label: 'SMB',
+ data: [670, 650, 650, 650],
+ backgroundColor: 'rgba(59, 130, 246, 0.8)'
+ }]
+ },
+ options: {
+ responsive: true,
+ scales: { y: { stacked: false, beginAtZero: true } }
+ }
+ });
+
+ // Chart 12 & 13: Top 10
+ createChartSafe('chartTop10Receita', {
+ type: 'bar',
+ data: {
+ labels: ['Indic. Colab.', 'Indic. Cliente', 'Tributário', 'SDR Inbound', 'LP Trabalhista'],
+ datasets: [{
+ data: [409216, 399879, 360168, 258706, 181364],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)'
+ }]
+ },
+ options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
+ });
+
+ createChartSafe('chartTop10Volume', {
+ type: 'bar',
+ data: {
+ labels: ['Tributário', 'SDR Inbound', 'LP Trabalhista', 'Indic. Colab.', 'Zendesk'],
+ datasets: [{
+ data: [18, 17, 9, 6, 6],
+ backgroundColor: 'rgba(59, 130, 246, 0.8)'
+ }]
+ },
+ options: { scales: { y: { beginAtZero: true } } }
+ });
+
+ // Novos Gráficos - Análise de Ações
+ 
+ // Gráfico: Ganhos x Perdidos
+ createChartSafe('chartGanhosPerdidos', {
+ type: 'bar',
+ data: {
+ labels: ['Marketing', 'Prospecção'],
+ datasets: [{
+ label: 'Ganhos',
+ data: [47, 24],
+ backgroundColor: 'rgba(255, 107, 53, 0.8)',
+ borderColor: 'rgba(255, 107, 53, 1)',
+ borderWidth: 2
+ }, {
+ label: 'Perdidos',
+ data: [443, 120],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ scales: { y: { beginAtZero: true } },
+ plugins: {
+ legend: { position: 'top' }
+ }
+ }
+ });
+
+ // Gráfico: Receita Comparativo
+ createChartSafe('chartReceitaComparativo', {
+ type: 'bar',
+ data: {
+ labels: ['Marketing', 'Prospecção'],
+ datasets: [{
+ label: 'Receita Ganha (R$ mil)',
+ data: [784.3, 1138.7],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)',
+ borderColor: 'rgba(16, 185, 129, 1)',
+ borderWidth: 2
+ }, {
+ label: 'Receita Perdida (R$ mil)',
+ data: [8346.0, 4478.2],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ scales: { y: { beginAtZero: true } },
+ plugins: {
+ legend: { position: 'top' }
+ }
+ }
+ });
+
+ // Gráfico: Top Conversão
+ createChartSafe('chartTopConversao', {
+ type: 'bar',
+ data: {
+ labels: [
+ 'indicacao-cliente (66.67%)',
+ 'seligman-escala6x1 (100%)',
+ 'indicacao-colaborador (30%)',
+ 'call-0509 (40%)',
+ 'prospeccao-ambiental (20%)',
+ 'dia-advogado (16.67%)',
+ 'call-tributos-0108 (16.67%)',
+ 'call-tributos-0703 (16.67%)',
+ 'pop-up-poder (14.29%)',
+ 'sdr-inbound (12.69%)',
+ 'prospeccao-retomada (12.50%)',
+ 'tributario (12.41%)',
+ 'call-tributos-0701 (11.11%)',
+ 'jota-pro-geral (10.71%)',
+ 'Zendesk (10.34%)'
+ ],
+ datasets: [{
+ label: 'Taxa de Conversão (%)',
+ data: [66.67, 100, 30, 40, 20, 16.67, 16.67, 16.67, 14.29, 12.69, 12.50, 12.41, 11.11, 10.71, 10.34],
+ backgroundColor: 'rgba(255, 107, 53, 0.8)',
+ borderColor: 'rgba(255, 107, 53, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ indexAxis: 'y',
+ scales: { x: { beginAtZero: true, max: 100 } },
+ plugins: {
+ legend: { display: false }
+ }
+ }
+ });
+
+ // Gráfico: Top Perdidos
+ createChartSafe('chartTopPerdidos', {
+ type: 'bar',
+ data: {
+ labels: [
+ 'tributario (127)',
+ 'sdr-inbound-pagina-pro (117)',
+ 'lp-trabalhista (94)',
+ 'Zendesk Comercial (52)',
+ 'formulario-tributos (40)',
+ 'programa-indicacao-interno (26)',
+ 'call-tributos-060625 (23)',
+ 'call-tributos-060625-2 (21)',
+ 'indicacao-colaborador (14)',
+ 'pro-saude (14)',
+ 'call-trabalhista-1306 (12)',
+ 'dia-do-advogado (10)',
+ 'mes-do-advogado (10)',
+ 'call-reforma-ir (9)',
+ 'pro-poder (8)'
+ ],
+ datasets: [{
+ label: 'Quantidade de Perdidos',
+ data: [127, 117, 94, 52, 40, 26, 23, 21, 14, 14, 12, 10, 10, 9, 8],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ indexAxis: 'y',
+ scales: { x: { beginAtZero: true } },
+ plugins: {
+ legend: { display: false }
+ }
+ }
+ });
+
+ // NOVOS GRÍFICOS - METAS 2025 VISUAIS
+
+ // Gráfico: Metas por Canal - Visão Anual
+ createChartSafe('chartMetasCanal', {
+ type: 'bar',
+ data: {
+ labels: ['Grandes Contas (T1)', 'SMB (T2)', 'TOTAL'],
+ datasets: [{
+ label: 'Marketing (70%)',
+ data: [1085, 1834, 2919],
+ backgroundColor: 'rgba(255, 107, 53, 0.8)',
+ borderColor: 'rgba(255, 107, 53, 1)',
+ borderWidth: 2
+ }, {
+ label: 'Prospecção (30%)',
+ data: [465, 786, 1251],
+ backgroundColor: 'rgba(247, 147, 30, 0.8)',
+ borderColor: 'rgba(247, 147, 30, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 2.5,
+ scales: {
+ x: { stacked: true },
+ y: { stacked: true, beginAtZero: true }
+ },
+ plugins: {
+ legend: { 
+ position: 'top',
+ labels: { font: { size: 11 } }
+ },
+ title: {
+ display: true,
+ text: 'Meta Anual: 4.170 MQL (2.919 Marketing + 1.251 Prospecção)',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: T1 Mix
+ createChartSafe('chartT1Mix', {
+ type: 'doughnut',
+ data: {
+ labels: ['Marketing - 1.085 MQL', 'Prospecção - 465 MQL'],
+ datasets: [{
+ data: [1085, 465],
+ backgroundColor: ['rgba(255, 107, 53, 0.8)', 'rgba(247, 147, 30, 0.8)'],
+ borderColor: ['rgba(255, 107, 53, 1)', 'rgba(247, 147, 30, 1)'],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ plugins: {
+ legend: { 
+ position: 'bottom',
+ labels: { font: { size: 10, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Total: 1.550 MQL/ano',
+ font: { size: 13, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: T2 Mix
+ createChartSafe('chartT2Mix', {
+ type: 'doughnut',
+ data: {
+ labels: ['Marketing - 1.834 MQL', 'Prospecção - 786 MQL'],
+ datasets: [{
+ data: [1834, 786],
+ backgroundColor: ['rgba(255, 107, 53, 0.8)', 'rgba(247, 147, 30, 0.8)'],
+ borderColor: ['rgba(255, 107, 53, 1)', 'rgba(247, 147, 30, 1)'],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ plugins: {
+ legend: { 
+ position: 'bottom',
+ labels: { font: { size: 10, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Total: 2.620 MQL/ano',
+ font: { size: 13, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: Evoluçção Trimestral
+ createChartSafe('chartEvolucaoTrimestral', {
+ type: 'line',
+ data: {
+ labels: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'],
+ datasets: [{
+ label: 'Grandes Contas (T1)',
+ data: [450, 500, 300, 300],
+ borderColor: 'rgba(16, 185, 129, 1)',
+ backgroundColor: 'rgba(16, 185, 129, 0.2)',
+ tension: 0.4,
+ fill: true,
+ borderWidth: 2,
+ pointRadius: 4,
+ pointHoverRadius: 6
+ }, {
+ label: 'SMB (T2)',
+ data: [670, 650, 650, 650],
+ borderColor: 'rgba(59, 130, 246, 1)',
+ backgroundColor: 'rgba(59, 130, 246, 0.2)',
+ tension: 0.4,
+ fill: true,
+ borderWidth: 2,
+ pointRadius: 4,
+ pointHoverRadius: 6
+ }, {
+ label: 'Total',
+ data: [1120, 1150, 950, 950],
+ borderColor: 'rgba(255, 107, 53, 1)',
+ backgroundColor: 'rgba(255, 107, 53, 0.2)',
+ tension: 0.4,
+ fill: true,
+ borderWidth: 2,
+ pointRadius: 4,
+ pointHoverRadius: 6
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 2.5,
+ scales: {
+ y: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { 
+ position: 'top',
+ labels: { font: { size: 11, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Distribuiçção de Metas ao Longo do Ano',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // GRÍFICOS T1 DETALHADO
+ // Gráfico: T1 Ganhos por Origem
+ createChartSafe('chartT1GanhosOrigem', {
+ type: 'doughnut',
+ data: {
+ labels: ['Outbound Orgânico (13)', 'Inbound (10)', 'Outbound Prospecção (4)', 'Renovação (2)'],
+ datasets: [{
+ data: [13, 10, 4, 2],
+ backgroundColor: [
+ 'rgba(16, 185, 129, 0.8)',
+ 'rgba(255, 107, 53, 0.8)',
+ 'rgba(59, 130, 246, 0.8)',
+ 'rgba(168, 85, 247, 0.8)'
+ ],
+ borderColor: [
+ 'rgba(16, 185, 129, 1)',
+ 'rgba(255, 107, 53, 1)',
+ 'rgba(59, 130, 246, 1)',
+ 'rgba(168, 85, 247, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.8,
+ plugins: {
+ legend: { 
+ position: 'bottom',
+ labels: { font: { size: 11, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Total: 29 Negócios Ganhos | Receita: R$ 1.55M',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: T1 Perdidos por Origem
+ createChartSafe('chartT1PerdidosOrigem', {
+ type: 'bar',
+ data: {
+ labels: ['Inbound', 'Outbound Prospecção', 'Outbound Orgânico', 'Quase-Inbound'],
+ datasets: [{
+ label: 'Negócios Perdidos',
+ data: [123, 57, 29, 2],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.8,
+ scales: { 
+ y: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { display: false },
+ title: {
+ display: true,
+ text: 'Total: 211 Negócios Perdidos | Valor Perdido: R$ 8.70M',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // GRÍFICOS T2 DETALHADO
+ // Gráfico: T2 Ganhos por Origem
+ createChartSafe('chartT2GanhosOrigem', {
+ type: 'doughnut',
+ data: {
+ labels: ['Inbound (63)', 'Outbound Prospecção (6)', 'Renovação (2)', 'Outbound Orgânico (1)'],
+ datasets: [{
+ data: [63, 6, 2, 1],
+ backgroundColor: [
+ 'rgba(255, 107, 53, 0.8)',
+ 'rgba(59, 130, 246, 0.8)',
+ 'rgba(168, 85, 247, 0.8)',
+ 'rgba(16, 185, 129, 0.8)'
+ ],
+ borderColor: [
+ 'rgba(255, 107, 53, 1)',
+ 'rgba(59, 130, 246, 1)',
+ 'rgba(168, 85, 247, 1)',
+ 'rgba(16, 185, 129, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.8,
+ plugins: {
+ legend: { 
+ position: 'bottom',
+ labels: { font: { size: 11, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Total: 72 Negócios Ganhos | Receita: R$ 963k',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: T2 Perdidos por Origem
+ createChartSafe('chartT2PerdidosOrigem', {
+ type: 'bar',
+ data: {
+ labels: ['Inbound', 'Outbound Prospecção', 'Outbound Orgânico', 'Inbound+Outbound'],
+ datasets: [{
+ label: 'Negócios Perdidos',
+ data: [527, 17, 16, 1],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.8,
+ scales: { 
+ y: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { display: false },
+ title: {
+ display: true,
+ text: 'Total: 561 Negócios Perdidos | Valor Perdido: R$ 8.72M',
+ font: { size: 12, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // Gráfico: T2 Taxa de Conversão por Origem
+ createChartSafe('chartT2ConversaoOrigem', {
+ type: 'bar',
+ data: {
+ labels: ['Inbound', 'Outbound Prospecção', 'Outbound Orgânico'],
+ datasets: [{
+ label: 'Ganhos',
+ data: [63, 6, 1],
+ backgroundColor: 'rgba(16, 185, 129, 0.8)',
+ borderColor: 'rgba(16, 185, 129, 1)',
+ borderWidth: 2
+ }, {
+ label: 'Perdidos',
+ data: [527, 17, 16],
+ backgroundColor: 'rgba(239, 68, 68, 0.8)',
+ borderColor: 'rgba(239, 68, 68, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 2.5,
+ scales: {
+ x: { stacked: false },
+ y: { stacked: false, beginAtZero: true }
+ },
+ plugins: {
+ legend: { 
+ position: 'top',
+ labels: { font: { size: 12, family: 'Times New Roman' } }
+ },
+ title: {
+ display: true,
+ text: 'Comparativo de Performance: Ganhos vs Perdidos por Origem',
+ font: { size: 13, weight: 'bold', family: 'Times New Roman' }
+ }
+ }
+ }
+ });
+
+ // ============================================
+ // GRÍFICOS OUTBOUND - ANÍLISE DE PROSPECÇÍO
+ // ============================================
+
+ // Gráfico: Top 10 Conversão Outbound - Taxa
+ createChartSafe('chartOutboundTop10Conversao', {
+ type: 'bar',
+ data: {
+ labels: [
+ 'Retomada T2 2021',
+ 'Retomada T2',
+ 'Lista Chambers',
+ 'MQLs Perdidos',
+ 'Clientes INFO',
+ 'LinkedIn T2',
+ 'Retomada Tributos'
+ ],
+ datasets: [{
+ label: 'Taxa de Conversão Final (%)',
+ data: [12.50, 1.35, 0.89, 0.40, 0.26, 0.22, 0.20],
+ backgroundColor: [
+ 'rgba(16, 185, 129, 0.8)',
+ 'rgba(16, 185, 129, 0.7)',
+ 'rgba(16, 185, 129, 0.6)',
+ 'rgba(255, 193, 7, 0.8)',
+ 'rgba(255, 193, 7, 0.7)',
+ 'rgba(255, 193, 7, 0.6)',
+ 'rgba(255, 193, 7, 0.5)'
+ ],
+ borderColor: [
+ 'rgba(16, 185, 129, 1)',
+ 'rgba(16, 185, 129, 1)',
+ 'rgba(16, 185, 129, 1)',
+ 'rgba(255, 193, 7, 1)',
+ 'rgba(255, 193, 7, 1)',
+ 'rgba(255, 193, 7, 1)',
+ 'rgba(255, 193, 7, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ indexAxis: 'y',
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ scales: {
+ x: { 
+ beginAtZero: true,
+ ticks: {
+ callback: function(value) {
+ return value + '%';
+ }
+ }
+ }
+ },
+ plugins: {
+ legend: { display: false },
+ tooltip: {
+ callbacks: {
+ label: function(context) {
+ return 'Taxa: ' + context.parsed.x + '%';
+ }
+ }
+ }
+ }
+ }
+ });
+
+ // Gráfico: Top 10 Conversão Outbound - Volume
+ createChartSafe('chartOutboundTop10Volume', {
+ type: 'bar',
+ data: {
+ labels: [
+ 'Retomada T2',
+ 'Lista Chambers',
+ 'MQLs Perdidos',
+ 'Clientes INFO',
+ 'LinkedIn T2',
+ 'Retomada Tributos',
+ 'Retomada T2 2021'
+ ],
+ datasets: [{
+ label: 'Conversões LIVE',
+ data: [6, 4, 4, 4, 1, 1, 1],
+ backgroundColor: 'rgba(255, 107, 53, 0.8)',
+ borderColor: 'rgba(255, 107, 53, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ indexAxis: 'y',
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ scales: {
+ x: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { display: false }
+ }
+ }
+ });
+
+ // Gráfico: Top MQLs Outbound
+ createChartSafe('chartOutboundTopMQLs', {
+ type: 'bar',
+ data: {
+ labels: [
+ 'LinkedIn T2 Q4',
+ 'Clientes INFO',
+ 'Retomada Tributos',
+ 'Retomada T2',
+ 'Lista Chambers',
+ 'MQLs Perdidos',
+ 'Consultoria LinkedIn',
+ 'Perdidos 2019-2020',
+ 'Retomada T2 2021',
+ 'Chambers Perdidos'
+ ],
+ datasets: [{
+ label: 'MQLs Gerados',
+ data: [54, 52, 52, 50, 46, 42, 39, 37, 8, 6],
+ backgroundColor: 'rgba(59, 130, 246, 0.8)',
+ borderColor: 'rgba(59, 130, 246, 1)',
+ borderWidth: 2
+ }]
+ },
+ options: {
+ indexAxis: 'y',
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ scales: {
+ x: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { display: false }
+ }
+ }
+ });
+
+ // Gráfico: Prospects por Origem Outbound
+ createChartSafe('chartOutboundProspectsPorOrigem', {
+ type: 'doughnut',
+ data: {
+ labels: ['Lista Interna (4.487)', 'Lista Externa (1.606)', 'Retomada (950)'],
+ datasets: [{
+ data: [4487, 1606, 950],
+ backgroundColor: [
+ 'rgba(239, 68, 68, 0.8)',
+ 'rgba(59, 130, 246, 0.8)',
+ 'rgba(16, 185, 129, 0.8)'
+ ],
+ borderColor: [
+ 'rgba(239, 68, 68, 1)',
+ 'rgba(59, 130, 246, 1)',
+ 'rgba(16, 185, 129, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ plugins: {
+ legend: { position: 'bottom' }
+ }
+ }
+ });
+
+ // Gráfico: Conversão por Origem Outbound
+ createChartSafe('chartOutboundConversaoPorOrigem', {
+ type: 'bar',
+ data: {
+ labels: ['Retomada', 'Lista Externa', 'Lista Interna'],
+ datasets: [{
+ label: 'Taxa de Conversão Final (%)',
+ data: [4.68, 0.14, 0.04],
+ backgroundColor: [
+ 'rgba(16, 185, 129, 0.8)',
+ 'rgba(59, 130, 246, 0.8)',
+ 'rgba(239, 68, 68, 0.8)'
+ ],
+ borderColor: [
+ 'rgba(16, 185, 129, 1)',
+ 'rgba(59, 130, 246, 1)',
+ 'rgba(239, 68, 68, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 1.5,
+ scales: {
+ y: { 
+ beginAtZero: true,
+ ticks: {
+ callback: function(value) {
+ return value + '%';
+ }
+ }
+ }
+ },
+ plugins: {
+ legend: { display: false },
+ tooltip: {
+ callbacks: {
+ label: function(context) {
+ return 'Taxa: ' + context.parsed.y + '%';
+ }
+ }
+ }
+ }
+ }
+ });
+
+ // Gráfico: Projeçção de Impacto Outbound
+ createChartSafe('chartOutboundProjecao', {
+ type: 'bar',
+ data: {
+ labels: ['Atual 2024', 'Projeçção 2025\n(Com Recomendações)'],
+ datasets: [{
+ label: 'Conversões LIVE',
+ data: [21, 70],
+ backgroundColor: [
+ 'rgba(239, 68, 68, 0.8)',
+ 'rgba(16, 185, 129, 0.8)'
+ ],
+ borderColor: [
+ 'rgba(239, 68, 68, 1)',
+ 'rgba(16, 185, 129, 1)'
+ ],
+ borderWidth: 2
+ }]
+ },
+ options: {
+ responsive: true,
+ maintainAspectRatio: true,
+ aspectRatio: 2.5,
+ scales: {
+ y: { beginAtZero: true }
+ },
+ plugins: {
+ legend: { display: false },
+ title: {
+ display: true,
+ text: 'Potencial de Crescimento: +233% em Conversões',
+ font: { size: 14, weight: 'bold' },
+ color: '#000'
+ }
+ }
+ }
+ });
+ 
+ }); // Fim do DOMContentLoaded
+</script>
+</body>
+</html>
